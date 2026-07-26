@@ -31,6 +31,7 @@ export interface IGame extends Document {
     phase: 'placement' | 'metadata_guess' | 'revealed';
     mode: 'local' | 'online';
     gameplayMode: 'individual' | 'teams';
+    deck: ICard[];
     players: IPlayer[];
     teams: ITeam[];
     currentTurnPlayerId: string;
@@ -74,6 +75,7 @@ const GameSchema = new Schema<IGame>({
     phase: { type: String, enum: ['placement', 'metadata_guess', 'revealed'], default: 'placement' },
     mode: { type: String, enum: ['local', 'online'], default: 'online' },
     gameplayMode: { type: String, enum: ['individual', 'teams'], default: 'individual' },
+    deck: [CardSchema],
     players: [PlayerSchema],
     teams: [TeamSchema],
     currentTurnPlayerId: { type: String, default: '' },

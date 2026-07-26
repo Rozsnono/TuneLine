@@ -36,8 +36,8 @@ export async function GET(request: NextRequest) {
                 { id: 'B', name: 'Red Team', timeline: [], score: 0, tokens: 0 }
             ];
         }
-        if (!game.deck || game.deck.length === 0) {
-            game.deck = shuffleDeck(MUSIC_LIBRARY);
+        if (!(game as any).deck || (game as any).deck.length === 0) {
+            (game as any).deck = shuffleDeck(MUSIC_LIBRARY);
         }
 
         const gameObj = game.toObject();
@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
                 youtubeId: gameObj.currentCard.youtubeId,
                 title: 'Secret Song',
                 artist: 'Secret Artist',
-                year: null
+                year: 0
             };
         }
 
@@ -117,8 +117,8 @@ export async function POST(request: NextRequest) {
                 { id: 'B', name: 'Red Team', timeline: [], score: 0, tokens: 0 }
             ];
         }
-        if (!game.deck || game.deck.length === 0) {
-            game.deck = shuffleDeck(MUSIC_LIBRARY);
+        if (!(game as any).deck || (game as any).deck.length === 0) {
+            (game as any).deck = shuffleDeck(MUSIC_LIBRARY);
         }
 
         // ACTION: Join room
@@ -229,7 +229,7 @@ export async function POST(request: NextRequest) {
                 game.currentTurnPlayerId = game.players[0].id;
             }
 
-            game.deck = deck;
+            (game as any).deck = deck;
             game.currentCard = deck.pop() || null;
             game.status = 'playing';
             game.phase = 'placement';
@@ -365,7 +365,7 @@ export async function POST(request: NextRequest) {
                 boardOwner.tokens -= 3;
                 if (!game.lastGuessCorrect) {
                     boardOwner.timeline.push(activeCard);
-                    boardOwner.timeline.sort((a, b) => a.year - b.year);
+                    boardOwner.timeline.sort((a: any, b: any) => a.year - b.year);
                     boardOwner.score = boardOwner.timeline.length;
                 }
             }

@@ -607,7 +607,7 @@ export default function Home() {
           setLocalInputName={setLocalInputName}
           localInputTeam={localInputTeam}
           setLocalInputTeam={setLocalInputTeam}
-          myPlayer={myPlayer}
+          myPlayer={myPlayer as any}
           copied={copied}
           message={message}
           onLeave={handleLeaveGame}
@@ -635,8 +635,8 @@ export default function Home() {
           playerId={playerId}
           activeModeType={activeModeType}
           isMyTurn={isMyTurn}
-          activePlayer={activePlayer}
-          myPlayer={myPlayer}
+          activePlayer={activePlayer as any}
+          myPlayer={myPlayer as any}
           canPlayActiveTurn={canPlayActiveTurn}
           isPlaying={isPlaying}
           playerRef={playerRef}
