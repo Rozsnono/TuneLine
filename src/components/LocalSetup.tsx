@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, Sparkles } from 'lucide-react';
 
 interface LocalSetupProps {
     setupGameplay: 'individual' | 'teams';
@@ -18,29 +18,35 @@ export default function LocalSetup({
     message
 }: LocalSetupProps) {
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-neutral-950 text-white px-4 animate-fade-in">
-            <div className="w-full max-w-sm p-6 bg-neutral-900 rounded-3xl shadow-2xl border border-neutral-850 space-y-6">
-                <div className="flex items-center gap-2">
+        <div className="flex flex-col items-center justify-center min-h-screen bg-[#050508] text-white px-4 relative overflow-hidden font-mono">
+            <div className="absolute top-[5%] left-[5%] w-[50%] h-[50%] bg-[#ff5722]/5 rounded-full blur-[110px] pointer-events-none"></div>
+
+            <div className="w-full max-w-sm p-6 bg-zinc-900/60 backdrop-blur-md rounded-3xl shadow-2xl border border-zinc-850 space-y-6 z-10">
+                <div className="flex items-center gap-3">
                     <button
                         onClick={onBack}
-                        className="p-2 hover:bg-neutral-800 rounded-xl border border-neutral-800 text-neutral-400 hover:text-white transition"
+                        className="p-2.5 bg-zinc-950/60 hover:bg-zinc-800 rounded-xl border border-zinc-800 text-zinc-400 hover:text-white transition active:scale-90"
                     >
                         <ChevronLeft className="w-4 h-4" />
                     </button>
                     <div>
-                        <h2 className="text-lg font-black text-white">Local Setup</h2>
-                        <p className="text-[10px] text-neutral-400">Pass-and-play matches</p>
+                        <h2 className="text-base font-black text-white uppercase tracking-tight">LOCAL GAMEPLAY</h2>
+                        <p className="text-[10px] text-[#ff5722] font-bold tracking-widest uppercase flex items-center gap-1 mt-0.5">
+                            <Sparkles className="w-3 h-3 animate-pulse" /> PASS_AND_PLAY_CONFIG
+                        </p>
                     </div>
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-5">
                     <div>
-                        <label className="block text-xs font-mono text-neutral-400 uppercase mb-1.5">Gameplay Format</label>
-                        <div className="grid grid-cols-2 gap-2 bg-neutral-950 p-1.5 rounded-xl border border-neutral-800">
+                        <label className="block text-xs text-zinc-500 uppercase tracking-widest mb-2">Gameplay Format</label>
+                        <div className="grid grid-cols-2 gap-2 bg-zinc-950/80 p-1.5 rounded-xl border border-zinc-850 shadow-inner">
                             <button
                                 type="button"
                                 onClick={() => setSetupGameplay('individual')}
-                                className={`py-2 rounded-lg text-xs font-bold transition ${setupGameplay === 'individual' ? 'bg-neutral-800 text-white shadow' : 'text-neutral-400'
+                                className={`py-2 text-xs font-bold transition duration-300 rounded-lg ${setupGameplay === 'individual'
+                                        ? 'bg-[#ff5722] text-white shadow-md'
+                                        : 'text-zinc-500 hover:text-zinc-300'
                                     }`}
                             >
                                 Individual
@@ -48,7 +54,9 @@ export default function LocalSetup({
                             <button
                                 type="button"
                                 onClick={() => setSetupGameplay('teams')}
-                                className={`py-2 rounded-lg text-xs font-bold transition ${setupGameplay === 'teams' ? 'bg-neutral-800 text-white shadow' : 'text-neutral-400'
+                                className={`py-2 text-xs font-bold transition duration-300 rounded-lg ${setupGameplay === 'teams'
+                                        ? 'bg-[#ff5722] text-white shadow-md'
+                                        : 'text-zinc-500 hover:text-zinc-300'
                                     }`}
                             >
                                 Team vs Team
@@ -58,9 +66,9 @@ export default function LocalSetup({
 
                     <button
                         onClick={onSubmit}
-                        className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-extrabold py-3.5 px-4 rounded-xl transition shadow-lg shadow-yellow-500/10 active:scale-95"
+                        className="w-full bg-[#f4f4f5] hover:bg-white text-zinc-950 font-extrabold py-3.5 px-4 rounded-xl transition active:scale-95 text-xs tracking-wider"
                     >
-                        Configure Player List
+                        CONFIGURE_PLAYER_ROSTER
                     </button>
                 </div>
 

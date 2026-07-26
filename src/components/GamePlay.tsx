@@ -1,16 +1,16 @@
 'use client';
 
+import { useState } from 'react';
 import { GameState, Player, Card } from '@/types/game';
 import {
     Music4,
     LogOut,
     Pause,
     Play,
-    Square,
     AlertTriangle,
     AlertCircle,
     Swords,
-    Disc
+    Coins
 } from 'lucide-react';
 
 interface GamePlayProps {
@@ -28,8 +28,9 @@ interface GamePlayProps {
     onReportBroken: () => void;
     onSubmitPlacement: () => void;
     onRevealMetadata: () => void;
-    onResolveTurnWithMetadata: (choice: 'none' | 'artist' | 'title' | 'both') => void;
+    onResolveTurnWithMetadata: (choice: 'none' | 'artist' | 'title' | 'both', recipientId?: string) => void;
     onSubmitSteal: () => void;
+    onBuyCard: () => void; // New callback for explicit token purchases
     selectedSlot: number | null;
     setSelectedSlot: (val: number | null) => void;
     isStealing: boolean;
@@ -56,6 +57,7 @@ export default function GamePlay({
     onRevealMetadata,
     onResolveTurnWithMetadata,
     onSubmitSteal,
+    onBuyCard,
     selectedSlot,
     setSelectedSlot,
     isStealing,
@@ -65,6 +67,9 @@ export default function GamePlay({
     message,
     onLeaveGame
 }: GamePlayProps) {
+    // Stateful turn resolution choices
+    const [metadataChoice, setMetadataChoice] = useState<'none' | 'artist' | 'title' | 'both' | null>(null);
+    const [tokenRecipientId, setTokenRecipientId] = useState<string>('');
 
     // Dynamic board calculations
     let activeTimelineOwnerName = '';
@@ -88,7 +93,7 @@ export default function GamePlay({
 
     // Steal possibilities
     let eligibleLocalStealers: { id: string; name: string }[] = [];
-    if (game.mode === 'local' && game.status === 'playing' && game.phase === 'revealed' && game.lastGuessCorrect === false) {
+    if (game.status === 'playing' && game.phase === 'revealed') {
         if (game.gameplayMode === 'teams') {
             const otherTeam = (game.teams || []).find((t) => t.id !== game.currentTurnTeamId);
             if (otherTeam) {
@@ -128,32 +133,46 @@ export default function GamePlay({
         }
     }
 
+    // Check if current user is eligible to buy card explicitly with 3 tokens [1, 2]
+    let myTokens = 0;
+    if (game.gameplayMode === 'teams') {
+        const myTeam = (game.teams || []).find((t) => t.id === myPlayer?.teamId);
+        myTokens = myTeam?.tokens || 0;
+    } else {
+        myTokens = myPlayer?.tokens || 0;
+    }
+
+    // Local Pass & Play handles active board tokens as eligible buy parameters
+    const displayBuyButton = activeModeType === 'local' ? activeTokens >= 3 : myTokens >= 3;
+
+    const handleResolveSubmit = () => {
+        if (metadataChoice === null) return;
+        onResolveTurnWithMetadata(metadataChoice, tokenRecipientId || undefined);
+        setMetadataChoice(null);
+        setTokenRecipientId('');
+    };
+
     return (
-        <div className="flex flex-col min-h-screen bg-neutral-950 text-white pb-12 animate-fade-in">
-            <header className="bg-neutral-900 border-b border-neutral-800 py-4 px-6 sticky top-0 z-50 flex justify-between items-center">
+        <div className="flex flex-col min-h-screen bg-[#050508] text-zinc-100 pb-12 font-mono animate-fade-in">
+            <header className="bg-zinc-950 border-b border-zinc-900 py-4 px-6 sticky top-0 z-50 flex justify-between items-center">
                 <div>
-                    <h1 className="text-xl font-bold tracking-tight text-yellow-500">HITSTER</h1>
-                    <span className="text-xs text-neutral-400 font-mono">ROOM: {game.roomId}</span>
+                    <h1 className="text-xl font-black tracking-tight text-white uppercase">TUNELINE</h1>
+                    <span className="text-xs text-zinc-500 font-mono">ROOM: {game.roomId}</span>
                 </div>
                 <div className="flex items-center gap-3">
                     <span
-                        className={`px-3 py-1 border rounded-full text-xs font-semibold flex items-center gap-1.5 ${game.gameplayMode === 'teams'
-                                ? game.currentTurnTeamId === 'A'
-                                    ? 'bg-blue-600/20 border-blue-500/20 text-blue-400'
-                                    : 'bg-red-600/20 border-red-500/20 text-red-400'
-                                : 'bg-neutral-850 border-neutral-300 text-neutral-300 border-neutral-800'
-                            }`}
+                        className="px-3 py-1.5 border border-[#ff5722]/30 bg-zinc-950 text-[#ff5722] rounded-full text-xs font-semibold flex items-center gap-1.5 shadow-[0_0_15px_rgba(255,87,34,0.1)]"
                     >
                         <Music4 className="w-3.5 h-3.5" />
                         {activeModeType === 'local'
-                            ? `${activeTimelineOwnerName} (${activePlayer?.name || 'Local Player'})`
+                            ? `${activeTimelineOwnerName} (${activePlayer?.name || 'Local'})`
                             : isMyTurn
                                 ? 'Your Turn'
                                 : `${activeTimelineOwnerName}`}
                     </span>
                     <button
                         onClick={onLeaveGame}
-                        className="p-2 bg-neutral-850 hover:bg-neutral-800 rounded-xl border border-neutral-750 transition text-neutral-400 hover:text-red-400 border-neutral-800"
+                        className="p-2 bg-zinc-900 hover:bg-zinc-850 rounded-xl border border-zinc-800 transition text-zinc-400 hover:text-red-400"
                         title="Exit Room"
                     >
                         <LogOut className="w-4 h-4" />
@@ -162,64 +181,63 @@ export default function GamePlay({
             </header>
 
             <main className="flex-1 max-w-md mx-auto w-full px-4 mt-6 space-y-6">
-                {/* Spinning Vinyl Record Player Card */}
-                <div className="bg-neutral-900 p-6 rounded-3xl border border-neutral-800 shadow-xl flex flex-col items-center">
-                    <div className="relative mb-6">
-                        {/* Spinning Record Core */}
+                {/* Sleek Concentric Platter Card */}
+                <div className="bg-zinc-900 p-6 rounded-3xl border border-zinc-800 shadow-xl flex flex-col items-center">
+                    <div className="relative w-44 h-44 flex items-center justify-center mb-6">
                         <div
-                            className={`w-40 h-40 rounded-full bg-neutral-950 border-8 border-neutral-800 shadow-2xl flex items-center justify-center transition-transform duration-1000 ${isPlaying ? 'animate-spin [animation-duration:10s]' : ''
+                            className={`absolute w-44 h-44 rounded-full border border-dashed border-zinc-800 flex items-center justify-center transition-transform duration-1000 ${isPlaying ? 'animate-spin [animation-duration:15s]' : ''
                                 }`}
                         >
-                            <div className="w-16 h-16 rounded-full bg-yellow-500 border-4 border-neutral-950 flex items-center justify-center">
-                                <Disc className={`w-8 h-8 text-neutral-950 ${isPlaying ? 'animate-pulse' : ''}`} />
-                            </div>
+                            <div className="w-32 h-32 rounded-full border border-zinc-850 absolute"></div>
+                            <div className="w-24 h-24 rounded-full border border-zinc-855/50 absolute"></div>
                         </div>
 
-                        {/* Tone Arm */}
-                        <div
-                            className={`absolute top-0 right-2 w-12 h-20 origin-top-left transition-transform duration-500 ${isPlaying ? 'rotate-[15deg]' : '-rotate-[15deg]'
-                                }`}
-                            style={{ transformOrigin: 'top left' }}
+                        <button
+                            onClick={onToggleAudio}
+                            className="w-16 h-16 rounded-full absolute bg-[#ff5722] hover:bg-[#ff6c37] transition-all duration-300 flex items-center justify-center cursor-pointer shadow-[0_0_20px_rgba(255,87,34,0.3)] hover:shadow-[0_0_25px_rgba(255,87,34,0.45)] active:scale-95 z-10 border border-[#ff6c37]/50"
                         >
-                            <div className="w-2 h-16 bg-neutral-400 rounded-full ml-6 shadow-md"></div>
-                            <div className="w-4 h-6 bg-neutral-500 rounded-sm ml-5 border border-neutral-600 shadow-sm"></div>
-                        </div>
+                            {isPlaying ? (
+                                <Pause className="w-6 h-6 text-white" />
+                            ) : (
+                                <Play className="w-6 h-6 text-white ml-1" />
+                            )}
+                        </button>
                     </div>
 
                     {game.phase === 'placement' && (
-                        <div className="text-center mb-6 space-y-1">
-                            <span className="text-[10px] font-bold tracking-widest bg-yellow-500/10 text-yellow-500 px-3 py-1 rounded-full uppercase">
-                                Phase 1: Chronology Placement
+                        <div className="text-center mb-4 space-y-1">
+                            <span className="text-[10px] font-bold tracking-widest bg-orange-500/10 text-[#ff5722] px-3 py-1 rounded-full uppercase border border-orange-500/20">
+                                01 / CHRONOLOGY_PLACEMENT
                             </span>
-                            <p className="text-neutral-400 text-xs mt-2 max-w-[280px]">
-                                Listen to the track and place it inside the <span className="text-neutral-100 font-bold">{activeTimelineOwnerName}</span> board.
+                            <p className="text-zinc-400 text-xs mt-3 max-w-[280px] font-sans">
+                                Listen and place this card chronologically inside the <span className="text-white font-bold">{activeTimelineOwnerName}</span> board.
                             </p>
                         </div>
                     )}
 
                     {game.phase === 'metadata_guess' && (
-                        <div className="text-center mb-6 space-y-1">
-                            <span className="text-[10px] font-bold tracking-widest bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full uppercase">
-                                Phase 2: Trivia Guessing
+                        <div className="text-center mb-4 space-y-1">
+                            <span className="text-[10px] font-bold tracking-widest bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full uppercase border border-emerald-500/20">
+                                02 / TRIVIA_GUESSING
                             </span>
-                            <p className="text-yellow-500 font-extrabold text-lg mt-2">Position Locked!</p>
-                            <p className="text-neutral-300 text-xs max-w-[280px] mt-1">
-                                Say the <span className="font-extrabold text-white">Song Title and Artist</span> out loud to the room.
+                            <p className="text-[#ff5722] font-extrabold text-base mt-3">POSITION_LOCKED</p>
+                            <p className="text-zinc-300 text-xs max-w-[280px] mt-1 font-sans">
+                                Say the <span className="font-extrabold text-white">Song Title & Artist</span> out loud to your friends.
                             </p>
                         </div>
                     )}
 
                     {game.phase === 'revealed' && (
-                        <div className="text-center mb-6 space-y-2 w-full">
-                            <span className="text-[10px] font-bold tracking-widest bg-blue-500/10 text-blue-400 px-3 py-1 rounded-full uppercase">
-                                Phase 3: Resolved
+                        <div className="text-center mb-4 space-y-2 w-full">
+                            <span className="text-[10px] font-bold tracking-widest bg-blue-500/10 text-blue-400 px-3 py-1 rounded-full uppercase border border-blue-500/20">
+                                03 / RESOLVED
                             </span>
-                            <div className="bg-neutral-950 p-4 rounded-2xl border border-neutral-850 mt-3 space-y-1">
-                                <span className="text-[9px] text-neutral-500 font-mono">SONG TRACK INFO</span>
-                                <h3 className="text-lg font-black text-white truncate px-2">{game.currentCard?.title}</h3>
-                                <p className="text-yellow-500 text-sm font-semibold truncate px-2">{game.currentCard?.artist}</p>
+                            <div className="bg-zinc-950 p-4 rounded-2xl border border-zinc-855 mt-3 space-y-1 text-left">
+                                <span className="text-[9px] text-zinc-500 font-mono uppercase tracking-wider">Song Info</span>
+                                <h3 className="text-base font-black text-white truncate font-sans">{game.currentCard?.title}</h3>
+                                <p className="text-[#ff5722] text-xs font-semibold truncate font-sans">{game.currentCard?.artist}</p>
                                 <div className="pt-2">
-                                    <span className="text-xs bg-neutral-900 border border-neutral-850 text-neutral-300 px-3 py-1 rounded-md font-mono font-bold">
+                                    <span className="text-[10px] bg-zinc-900 border border-zinc-800 text-zinc-300 px-2 py-0.5 rounded font-mono font-bold">
                                         Released: {game.currentCard?.year}
                                     </span>
                                 </div>
@@ -227,273 +245,256 @@ export default function GamePlay({
                         </div>
                     )}
 
-                    <div className="flex gap-3">
-                        <button
-                            onClick={onToggleAudio}
-                            className="bg-yellow-500 hover:bg-yellow-600 text-neutral-950 font-bold py-3 px-5 rounded-xl flex items-center gap-2 transition active:scale-95 text-xs shadow-md shadow-yellow-500/10"
-                        >
-                            {isPlaying ? <><Pause className="w-4 h-4" /> Pause</> : <><Play className="w-4 h-4" /> Play Audio</>}
-                        </button>
-                        <button
-                            onClick={onStopAudio}
-                            className="bg-neutral-850 hover:bg-neutral-800 text-neutral-200 font-bold py-3 px-5 rounded-xl flex items-center gap-2 border border-neutral-700 transition active:scale-95 text-xs"
-                        >
-                            <Square className="w-4 h-4" /> Stop
-                        </button>
-                    </div>
-
-                    {/* Real-time Song Reporting Option */}
+                    {/* Skip/Flag Handler */}
                     {canPlayActiveTurn && game.status === 'playing' && (
                         <button
                             onClick={onReportBroken}
-                            className="mt-4 text-[10px] uppercase font-mono tracking-wider text-neutral-500 hover:text-red-400 flex items-center gap-1 transition active:scale-95"
+                            className="mt-2 text-[9px] uppercase tracking-wider text-zinc-500 hover:text-red-400 flex items-center gap-1.5 transition active:scale-95"
                         >
-                            <AlertTriangle className="w-3.5 h-3.5 text-yellow-500" /> Report / Skip Song
+                            <AlertTriangle className="w-3.5 h-3.5 text-yellow-600" /> [ SKIP_BROKEN_SONG ]
                         </button>
                     )}
                 </div>
 
-                {/* Dynamic Steal Option / Challenger Timeline Board overlay */}
-                {isStealing && (
-                    <div className="bg-neutral-900 p-5 rounded-3xl border border-dashed border-red-500/40 shadow-xl space-y-4 animate-fade-in">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2 text-red-400 font-bold text-sm uppercase font-mono">
-                                <Swords className="w-4 h-4 animate-pulse" /> Stealer: {stealOwnerName}
-                            </div>
-                            <button
-                                onClick={() => { setIsStealing(false); setSelectedSlot(null); }}
-                                className="text-xs text-neutral-500 hover:text-neutral-300 font-semibold"
-                            >
-                                Cancel Steal
-                            </button>
-                        </div>
-
-                        <div className="space-y-3">
-                            <button
-                                onClick={() => setSelectedSlot(0)}
-                                className={`w-full py-2 border border-dashed rounded-xl text-[10px] flex items-center justify-center gap-1 ${selectedSlot === 0 ? 'bg-red-500/20 border-red-500 text-red-400 font-bold' : 'border-neutral-800 text-neutral-600'
-                                    }`}
-                            >
-                                Place Steal Here (Oldest)
-                            </button>
-
-                            {(stealTimeline || []).map((card, idx) => (
-                                <div key={card.id} className="space-y-3">
-                                    <div className="bg-neutral-950 p-3.5 rounded-2xl flex justify-between items-center border border-neutral-850 relative overflow-hidden">
-                                        <div className="absolute top-0 left-0 bottom-0 w-1 bg-red-500/50"></div>
-                                        <div>
-                                            <div className="font-bold text-xs text-neutral-300">{card.title}</div>
-                                            <div className="text-[10px] text-neutral-500 mt-0.5">{card.artist}</div>
-                                        </div>
-                                        <span className="bg-neutral-900 text-red-400 font-mono text-[10px] px-2 py-0.5 rounded border border-neutral-800 font-bold">
-                                            {card.year}
-                                        </span>
-                                    </div>
-
-                                    <button
-                                        onClick={() => setSelectedSlot(idx + 1)}
-                                        className={`w-full py-2 border border-dashed rounded-xl text-[10px] flex items-center justify-center gap-1 ${selectedSlot === idx + 1 ? 'bg-red-500/20 border-red-500 text-red-400 font-bold' : 'border-neutral-800 text-neutral-600'
-                                            }`}
-                                    >
-                                        Place Steal Here
-                                    </button>
-                                </div>
-                            ))}
-                        </div>
-
-                        <button
-                            disabled={selectedSlot === null}
-                            onClick={onSubmitSteal}
-                            className="w-full bg-red-600 hover:bg-red-700 text-white font-extrabold py-3 px-4 rounded-xl text-xs transition disabled:opacity-50"
-                        >
-                            Submit Steal Attempt (Penalty: -1 Token if wrong)
-                        </button>
-                    </div>
-                )}
-
-                {/* Current Turn Board Layout */}
-                {!isStealing && (
-                    <div className="space-y-4">
-                        <div className="flex justify-between items-center border-b border-neutral-900 pb-2">
-                            <h3 className="text-xs uppercase font-mono tracking-wider text-neutral-500">
-                                Active Board: {activeTimelineOwnerName}
-                            </h3>
-                            <span className="text-xs text-yellow-500 font-mono bg-yellow-500/10 px-2 py-0.5 rounded border border-yellow-500/20">
+                {/* User Board Ledger */}
+                <div className="space-y-4">
+                    <div className="flex justify-between items-center border-b border-zinc-900 pb-2">
+                        <h3 className="text-xs uppercase tracking-widest text-zinc-500">Board: {activeTimelineOwnerName}</h3>
+                        <div className="flex items-center gap-3">
+                            {/* Tactical explicit Token Card purchasing button [1, 2] */}
+                            {displayBuyButton && (
+                                <button
+                                    onClick={onBuyCard}
+                                    className="px-2.5 py-1 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-lg text-[9px] tracking-wider transition active:scale-95 flex items-center gap-1 shadow-[0_0_15px_rgba(255,87,34,0.2)]"
+                                >
+                                    <Coins className="w-3 h-3" /> BUY_CARD_3_TOKENS
+                                </button>
+                            )}
+                            <span className="text-xs text-[#ff5722] font-mono bg-orange-500/10 px-2 py-0.5 rounded border border-orange-500/20 font-bold">
                                 Tokens: {activeTokens}
                             </span>
                         </div>
+                    </div>
 
-                        <div className="space-y-3">
-                            {/* Slot 0 Button */}
-                            {game.phase === 'placement' && canPlayActiveTurn && (
+                    <div className="space-y-3">
+                        {/* Slot 0 Button */}
+                        {game.phase === 'placement' && canPlayActiveTurn && (
+                            <button
+                                onClick={() => setSelectedSlot(0)}
+                                className={`w-full py-2.5 border border-dashed rounded-xl transition text-[10px] flex items-center justify-center gap-1.5 ${selectedSlot === 0
+                                        ? 'bg-orange-500/10 border-[#ff5722] text-[#ff5722] font-bold'
+                                        : 'border-zinc-800 text-zinc-500 hover:border-zinc-700 hover:text-zinc-300'
+                                    }`}
+                            >
+                                [ ✦ PRIOR TO {activeTimeline[0]?.year || 'Start'} ✦ ]
+                            </button>
+                        )}
+
+                        {activeTimeline.map((card, idx) => (
+                            <div key={card.id} className="space-y-3">
+                                <div className="bg-zinc-900 p-4 rounded-2xl flex justify-between items-center border border-zinc-850 shadow-sm relative overflow-hidden group">
+                                    <div
+                                        className={`absolute top-0 left-0 bottom-0 w-1 ${game.gameplayMode === 'teams'
+                                                ? game.currentTurnTeamId === 'A' ? 'bg-blue-500' : 'bg-red-500'
+                                                : 'bg-[#ff5722]'
+                                            }`}
+                                    ></div>
+                                    <div className="font-sans">
+                                        <div className="font-bold text-sm text-zinc-200">{card.title}</div>
+                                        <div className="text-xs text-zinc-500 mt-0.5">{card.artist}</div>
+                                    </div>
+
+                                    <div className="bg-gradient-to-b from-[#ff5722] to-[#b45309] text-white px-3 py-1.5 rounded-lg border border-[#b45309]/50 font-mono font-bold text-xs shadow-[0_0_15px_rgba(255,87,34,0.15)]">
+                                        {card.year}
+                                    </div>
+                                </div>
+
+                                {/* Insertion Slot Buttons */}
+                                {game.phase === 'placement' && canPlayActiveTurn && (
+                                    <button
+                                        onClick={() => setSelectedSlot(idx + 1)}
+                                        className={`w-full py-2.5 border-2 border-dashed rounded-xl transition text-[10px] flex items-center justify-center gap-1.5 ${selectedSlot === idx + 1
+                                                ? 'bg-orange-500/10 border-[#ff5722] text-[#ff5722] font-bold'
+                                                : 'border-zinc-800 text-zinc-500 hover:border-zinc-700 hover:text-zinc-300'
+                                            }`}
+                                    >
+                                        [ ✦ {idx + 2 < 10 ? `0${idx + 2}` : idx + 2} / INSERT POSITION ✦ ]
+                                    </button>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Turn Resolution controls */}
+                    {canPlayActiveTurn && (
+                        <div className="pt-4">
+                            {game.phase === 'placement' && (
                                 <button
-                                    onClick={() => setSelectedSlot(0)}
-                                    className={`w-full py-2.5 border-2 border-dashed rounded-xl transition text-xs flex items-center justify-center gap-1.5 ${selectedSlot === 0
-                                            ? 'bg-yellow-500/10 border-yellow-500 text-yellow-400 font-bold'
-                                            : 'border-neutral-850 text-neutral-600 hover:border-neutral-800 hover:text-neutral-500'
-                                        }`}
+                                    disabled={selectedSlot === null}
+                                    onClick={onSubmitPlacement}
+                                    className="w-full bg-[#f4f4f5] disabled:bg-zinc-900 disabled:text-zinc-600 disabled:border disabled:border-zinc-850 hover:bg-white text-zinc-950 font-extrabold py-3.5 px-4 rounded-xl transition text-xs"
                                 >
-                                    <Plus className="w-3.5 h-3.5" /> Place Here (Oldest)
+                                    EXECUTE_SUBMISSION
                                 </button>
                             )}
 
-                            {(activeTimeline || []).map((card, idx) => (
-                                <div key={card.id} className="space-y-3">
-                                    <div className="bg-neutral-900 p-4 rounded-2xl flex justify-between items-center border border-neutral-850 shadow-sm relative overflow-hidden group">
-                                        <div
-                                            className={`absolute top-0 left-0 bottom-0 w-1 ${game.gameplayMode === 'teams'
-                                                    ? game.currentTurnTeamId === 'A' ? 'bg-blue-500' : 'bg-red-500'
-                                                    : 'bg-yellow-500'
-                                                }`}
-                                        ></div>
-                                        <div>
-                                            <div className="font-bold text-sm text-neutral-200">{card.title}</div>
-                                            <div className="text-xs text-neutral-400 mt-0.5">{card.artist}</div>
-                                        </div>
-                                        <span className="bg-neutral-950 text-yellow-500 font-mono text-xs px-2.5 py-1 rounded-md border border-neutral-800 font-bold">
-                                            {card.year}
+                            {game.phase === 'metadata_guess' && (
+                                <button
+                                    onClick={onRevealMetadata}
+                                    className="w-full bg-[#f4f4f5] hover:bg-white text-zinc-950 font-extrabold py-3.5 px-4 rounded-xl transition text-xs"
+                                >
+                                    REVEAL_ANSWER_DETAILS
+                                </button>
+                            )}
+
+                            {game.phase === 'revealed' && (
+                                <div className="space-y-4 p-4 bg-zinc-900 rounded-3xl border border-zinc-855">
+                                    <div className="flex justify-center items-center gap-2 text-zinc-300 text-xs">
+                                        <AlertCircle className="w-4 h-4 text-orange-500" />
+                                        <span>
+                                            Timeline guess was:{' '}
+                                            <span className={`font-bold ${game.lastGuessCorrect ? 'text-emerald-400' : 'text-red-400'}`}>
+                                                {game.lastGuessCorrect ? 'CORRECT' : 'INCORRECT'}
+                                            </span>
                                         </span>
                                     </div>
 
-                                    {/* Insertion Slot Button */}
-                                    {game.phase === 'placement' && canPlayActiveTurn && (
-                                        <button
-                                            onClick={() => setSelectedSlot(idx + 1)}
-                                            className={`w-full py-2.5 border-2 border-dashed rounded-xl transition text-xs flex items-center justify-center gap-1.5 ${selectedSlot === idx + 1
-                                                    ? 'bg-yellow-500/10 border-yellow-500 text-yellow-400 font-bold'
-                                                    : 'border-neutral-850 text-neutral-600 hover:border-neutral-800 hover:text-neutral-500'
-                                                }`}
-                                        >
-                                            <Plus className="w-3.5 h-3.5" /> Place Here
-                                        </button>
-                                    )}
-                                </div>
-                            ))}
-                        </div>
-
-                        {/* Turn Resolution controls */}
-                        {canPlayActiveTurn && (
-                            <div className="pt-4">
-                                {game.phase === 'placement' && (
-                                    <button
-                                        disabled={selectedSlot === null}
-                                        onClick={onSubmitPlacement}
-                                        className="w-full bg-yellow-500 disabled:bg-neutral-900 disabled:text-neutral-600 disabled:border disabled:border-neutral-850 hover:bg-yellow-600 text-black font-extrabold py-4 px-4 rounded-xl transition shadow-lg shadow-yellow-500/5 text-sm animate-pulse"
-                                    >
-                                        Lock Placement Guess
-                                    </button>
-                                )}
-
-                                {game.phase === 'metadata_guess' && (
-                                    <button
-                                        onClick={onRevealMetadata}
-                                        className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-extrabold py-4 px-4 rounded-xl transition shadow-lg shadow-yellow-500/5 text-sm"
-                                    >
-                                        Reveal Answer Details
-                                    </button>
-                                )}
-
-                                {game.phase === 'revealed' && (
-                                    <div className="space-y-4 p-4 bg-neutral-900 rounded-3xl border border-neutral-850">
-                                        <div className="flex justify-center items-center gap-2 text-neutral-300 text-xs">
-                                            <AlertCircle className="w-4 h-4 text-yellow-500" />
-                                            <span>
-                                                Timeline guess was:{' '}
-                                                <span className={`font-bold ${game.lastGuessCorrect ? 'text-emerald-400' : 'text-red-400'}`}>
-                                                    {game.lastGuessCorrect ? 'CORRECT' : 'INCORRECT'}
-                                                </span>
+                                    {/* Stateful Guess Rating & Opponent Steal Interface */}
+                                    <div className="pt-2 border-t border-zinc-800 space-y-4">
+                                        <div className="space-y-2">
+                                            <span className="text-[10px] text-zinc-500 uppercase tracking-wider font-bold">
+                                                Rate active player's metadata guess:
                                             </span>
+                                            <div className="grid grid-cols-2 gap-2">
+                                                <button
+                                                    onClick={() => setMetadataChoice('none')}
+                                                    className={`py-2 px-3 rounded-xl text-xs font-bold border transition ${metadataChoice === 'none'
+                                                            ? 'bg-zinc-100 text-zinc-950 border-white'
+                                                            : 'bg-zinc-950 text-zinc-400 border-zinc-800 hover:text-zinc-200'
+                                                        }`}
+                                                >
+                                                    Missed Both (0)
+                                                </button>
+                                                <button
+                                                    onClick={() => setMetadataChoice('artist')}
+                                                    className={`py-2 px-3 rounded-xl text-xs font-bold border transition ${metadataChoice === 'artist'
+                                                            ? 'bg-[#ff5722] text-white border-[#ff6c37]'
+                                                            : 'bg-zinc-950 text-zinc-400 border-zinc-800 hover:text-zinc-200'
+                                                        }`}
+                                                >
+                                                    Only Artist (+1)
+                                                </button>
+                                                <button
+                                                    onClick={() => setMetadataChoice('title')}
+                                                    className={`py-2 px-3 rounded-xl text-xs font-bold border transition ${metadataChoice === 'title'
+                                                            ? 'bg-[#ff5722] text-white border-[#ff6c37]'
+                                                            : 'bg-zinc-950 text-zinc-400 border-zinc-800 hover:text-zinc-200'
+                                                        }`}
+                                                >
+                                                    Only Title (+1)
+                                                </button>
+                                                <button
+                                                    onClick={() => setMetadataChoice('both')}
+                                                    className={`py-2 px-3 rounded-xl text-xs font-bold border transition ${metadataChoice === 'both'
+                                                            ? 'bg-emerald-600 text-white border-emerald-500'
+                                                            : 'bg-zinc-950 text-zinc-400 border-zinc-800 hover:text-zinc-200'
+                                                        }`}
+                                                >
+                                                    Guessed Both! (+2)
+                                                </button>
+                                            </div>
                                         </div>
 
-                                        {/* Active Guess Rating */}
-                                        {game.lastGuessCorrect && (
-                                            <div className="pt-2 border-t border-neutral-800">
-                                                <div className="grid grid-cols-2 gap-2 mt-3">
-                                                    <button
-                                                        onClick={() => onResolveTurnWithMetadata('none')}
-                                                        className="bg-neutral-800 hover:bg-neutral-750 text-white font-bold py-2.5 px-3 rounded-xl text-xs border border-neutral-705 transition active:scale-95"
-                                                    >
-                                                        Missed Both (0 Tokens)
-                                                    </button>
-                                                    <button
-                                                        onClick={() => onResolveTurnWithMetadata('artist')}
-                                                        className="bg-yellow-600/30 border border-yellow-500/30 hover:bg-yellow-600/40 text-yellow-400 font-bold py-2.5 px-3 rounded-xl text-xs transition active:scale-95"
-                                                    >
-                                                        Only Artist (+1)
-                                                    </button>
-                                                    <button
-                                                        onClick={() => onResolveTurnWithMetadata('title')}
-                                                        className="bg-yellow-600/30 border border-yellow-500/30 hover:bg-yellow-600/40 text-yellow-400 font-bold py-2.5 px-3 rounded-xl text-xs transition active:scale-95"
-                                                    >
-                                                        Only Title (+1)
-                                                    </button>
-                                                    <button
-                                                        onClick={() => onResolveTurnWithMetadata('both')}
-                                                        className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-3 rounded-xl text-xs transition active:scale-95"
-                                                    >
-                                                        Guessed Both! (+2)
-                                                    </button>
-                                                </div>
+                                        {/* Dynamic Opponent Token Steal Selector [1] */}
+                                        {metadataChoice !== null && metadataChoice !== 'both' && eligibleLocalStealers.length > 0 && (
+                                            <div className="bg-zinc-950 p-3 rounded-2xl border border-zinc-800 space-y-2 animate-fade-in">
+                                                <label className="block text-[10px] text-zinc-500 uppercase tracking-wider font-bold">
+                                                    Did another player guess the remainder?
+                                                </label>
+                                                <select
+                                                    className="w-full bg-zinc-900 p-2 text-xs rounded-xl border border-zinc-800 focus:outline-none text-zinc-300"
+                                                    value={tokenRecipientId}
+                                                    onChange={(e) => setTokenRecipientId(e.target.value)}
+                                                >
+                                                    <option value="">No one / None</option>
+                                                    {eligibleLocalStealers.map((s) => (
+                                                        <option key={s.id} value={s.id}>
+                                                            {s.name} (+{2 - (metadataChoice === 'none' ? 0 : 1)} Token{2 - (metadataChoice === 'none' ? 0 : 1) > 1 ? 's' : ''})
+                                                        </option>
+                                                    ))}
+                                                </select>
                                             </div>
                                         )}
 
-                                        {!game.lastGuessCorrect && (
-                                            <div className="pt-2 border-t border-neutral-800 flex flex-col gap-3">
-                                                <button
-                                                    onClick={() => onResolveTurnWithMetadata('none')}
-                                                    className="w-full bg-neutral-850 hover:bg-neutral-800 text-neutral-300 font-bold py-3 px-4 rounded-xl text-xs transition active:scale-95 border border-neutral-800"
-                                                >
-                                                    Discard Card & Next Turn
-                                                </button>
+                                        {/* Final Confirmation Submission */}
+                                        <button
+                                            disabled={metadataChoice === null}
+                                            onClick={handleResolveSubmit}
+                                            className="w-full bg-[#f4f4f5] disabled:bg-zinc-950 disabled:text-zinc-700 disabled:border disabled:border-zinc-850 hover:bg-white text-zinc-950 font-extrabold py-3.5 px-4 rounded-xl transition text-xs tracking-wider"
+                                        >
+                                            CONFIRM_AND_RESOLVE_TURN
+                                        </button>
+                                    </div>
 
-                                                {activeModeType === 'local' && eligibleLocalStealers.length > 0 && (
-                                                    <div className="p-3 bg-neutral-950 rounded-2xl border border-neutral-850 space-y-2">
-                                                        <span className="text-[10px] text-red-400 font-bold uppercase font-mono tracking-wider flex items-center gap-1.5">
-                                                            <Swords className="w-3.5 h-3.5" /> Steal Opportunity (Pass-And-Play)
-                                                        </span>
-                                                        <div className="flex gap-2">
-                                                            <select
-                                                                className="flex-1 bg-neutral-800 p-2 text-xs rounded-xl border border-neutral-700 focus:outline-none font-sans"
-                                                                value={localStealerId}
-                                                                onChange={(e) => setLocalStealerId(e.target.value)}
-                                                            >
-                                                                <option value="">Select Stealer...</option>
-                                                                {eligibleLocalStealers.map((s) => (
-                                                                    <option key={s.id} value={s.id}>{s.name}</option>
-                                                                ))}
-                                                            </select>
-                                                            <button
-                                                                disabled={!localStealerId}
-                                                                onClick={() => setIsStealing(true)}
-                                                                className="bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-bold px-4 py-2 rounded-xl text-xs transition flex items-center gap-1"
-                                                            >
-                                                                <Swords className="w-3.5 h-3.5" /> Steal!
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                )}
+                                    {/* Cardboard Discard options (if timeline guess was incorrect) */}
+                                    {!game.lastGuessCorrect && metadataChoice === null && (
+                                        <div className="pt-2 border-t border-zinc-800 flex flex-col gap-3">
+                                            <button
+                                                onClick={() => onResolveTurnWithMetadata('none')}
+                                                className="w-full bg-zinc-950 hover:bg-zinc-850 text-neutral-300 font-bold py-3 px-4 rounded-xl text-xs transition active:scale-95 border border-zinc-800"
+                                            >
+                                                [ DISCARD_CARD_NEXT_TURN ]
+                                            </button>
 
-                                                {activeModeType === 'online' && !isMyTurn && (
-                                                    <div className="p-3 bg-neutral-950 rounded-2xl border border-neutral-850 flex items-center justify-between animate-pulse">
-                                                        <span className="text-[10px] text-red-400 font-bold uppercase font-mono tracking-wider flex items-center gap-1">
-                                                            <Swords className="w-3.5 h-3.5" /> Opponent Missed!
-                                                        </span>
-                                                        <button
-                                                            onClick={() => setIsStealing(true)}
-                                                            className="bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition flex items-center gap-1 active:scale-95"
+                                            {/* Local Match Steal Panel Dropdown */}
+                                            {activeModeType === 'local' && eligibleLocalStealers.length > 0 && (
+                                                <div className="p-3 bg-zinc-950 rounded-2xl border border-zinc-850 space-y-2">
+                                                    <span className="text-[10px] text-red-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                                                        <Swords className="w-3.5 h-3.5 animate-pulse" /> CHALLENGER_STEAL
+                                                    </span>
+                                                    <div className="flex gap-2">
+                                                        <select
+                                                            className="flex-1 bg-zinc-900 p-2 text-xs rounded-xl border border-zinc-800 focus:outline-none text-zinc-300 font-sans"
+                                                            value={localStealerId}
+                                                            onChange={(e) => setLocalStealerId(e.target.value)}
                                                         >
-                                                            <Swords className="w-3.5 h-3.5" /> Attempt Steal
+                                                            <option value="">Select Stealer...</option>
+                                                            {eligibleLocalStealers.map((s) => (
+                                                                <option key={s.id} value={s.id}>{s.name}</option>
+                                                            ))}
+                                                        </select>
+                                                        <button
+                                                            disabled={!localStealerId}
+                                                            onClick={() => setIsStealing(true)}
+                                                            className="bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-bold px-4 py-2 rounded-xl text-xs transition flex items-center gap-1"
+                                                        >
+                                                            <Swords className="w-3.5 h-3.5" /> STEAL
                                                         </button>
                                                     </div>
-                                                )}
-                                            </div>
-                                        )}
-                                    </div>
-                                )}
-                            </div>
-                        )}
-                    </div>
-                )}
+                                                </div>
+                                            )}
+
+                                            {/* Online Match Steal panel */}
+                                            {activeModeType === 'online' && !isMyTurn && (
+                                                <div className="p-3 bg-zinc-950 rounded-2xl border border-zinc-850 flex items-center justify-between">
+                                                    <span className="text-[10px] text-red-400 font-bold uppercase tracking-wider flex items-center gap-1">
+                                                        <Swords className="w-3.5 h-3.5" /> OPPONENT_MISSED
+                                                    </span>
+                                                    <button
+                                                        onClick={() => setIsStealing(true)}
+                                                        className="bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition flex items-center gap-1 active:scale-95"
+                                                    >
+                                                        <Swords className="w-3.5 h-3.5" /> STEAL
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
 
                 {message && (
                     <p className="p-3 bg-red-950/20 text-red-400 border border-red-900/30 rounded-xl text-center text-xs animate-pulse font-medium">

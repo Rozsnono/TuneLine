@@ -1,6 +1,6 @@
 import { ICard } from "@/models/Game";
 
-export const DECK: ICard[] = [
+export const MUSIC_LIBRARY: ICard[] = [
     {
         "id": "1",
         "title": "In The Mood",
@@ -1323,6 +1323,13 @@ export const DECK: ICard[] = [
         "artist": "Első Emelet",
         "year": 1986,
         "youtubeId": "AzRlnryPF9s"
+    },
+    {
+        "id": "1980_61",
+        "title": "We didn't start the fire",
+        "artist": "Billy Joel",
+        "year": 1989,
+        "youtubeId": "eFTLKWw542g"
     },
     {
         "id": "1990_1",

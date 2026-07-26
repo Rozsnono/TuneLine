@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, Sparkles } from 'lucide-react';
 
 interface OnlineSetupProps {
     setupGameplay: 'individual' | 'teams';
@@ -28,29 +28,35 @@ export default function OnlineSetup({
     message
 }: OnlineSetupProps) {
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-neutral-950 text-white px-4 animate-fade-in">
-            <div className="w-full max-w-sm p-6 bg-neutral-900 rounded-3xl shadow-2xl border border-neutral-850 space-y-4">
-                <div className="flex items-center gap-2 mb-2">
+        <div className="flex flex-col items-center justify-center min-h-screen bg-[#050508] text-white px-4 relative overflow-hidden font-mono">
+            <div className="absolute top-[5%] left-[5%] w-[50%] h-[50%] bg-[#ff5722]/5 rounded-full blur-[110px] pointer-events-none"></div>
+
+            <div className="w-full max-w-sm p-6 bg-zinc-900/60 backdrop-blur-md rounded-3xl shadow-2xl border border-zinc-850 space-y-4 z-10">
+                <div className="flex items-center gap-3 mb-2">
                     <button
                         onClick={onBack}
-                        className="p-2 hover:bg-neutral-800 rounded-xl border border-neutral-800 text-neutral-400 hover:text-white transition"
+                        className="p-2.5 bg-zinc-950/60 hover:bg-zinc-800 rounded-xl border border-zinc-800 text-zinc-400 hover:text-white transition active:scale-90"
                     >
                         <ChevronLeft className="w-4 h-4" />
                     </button>
                     <div>
-                        <h2 className="text-lg font-black text-white">Online Setup</h2>
-                        <p className="text-[10px] text-neutral-400">Multi-device matching</p>
+                        <h2 className="text-base font-black text-white uppercase tracking-tight">ONLINE SETUP</h2>
+                        <p className="text-[10px] text-[#ff5722] font-bold tracking-widest uppercase flex items-center gap-1 mt-0.5 animate-pulse">
+                            <Sparkles className="w-3 h-3" /> MATCH_ROOM_ESTABLISHMENT
+                        </p>
                     </div>
                 </div>
 
                 <div className="space-y-3">
                     <div>
-                        <label className="block text-xs font-mono text-neutral-400 uppercase mb-1.5">Lobby Format</label>
-                        <div className="grid grid-cols-2 gap-2 bg-neutral-950 p-1.5 rounded-xl border border-neutral-800">
+                        <label className="block text-xs text-zinc-500 uppercase tracking-widest mb-1.5">Lobby Format</label>
+                        <div className="grid grid-cols-2 gap-2 bg-zinc-950/80 p-1.5 rounded-xl border border-zinc-850 shadow-inner">
                             <button
                                 type="button"
                                 onClick={() => setSetupGameplay('individual')}
-                                className={`py-2 rounded-lg text-xs font-bold transition ${setupGameplay === 'individual' ? 'bg-neutral-800 text-white shadow' : 'text-neutral-400'
+                                className={`py-2 rounded-lg text-xs font-bold transition duration-300 ${setupGameplay === 'individual'
+                                        ? 'bg-[#ff5722] text-white shadow-md'
+                                        : 'text-zinc-500 hover:text-zinc-300'
                                     }`}
                             >
                                 Individual
@@ -58,7 +64,9 @@ export default function OnlineSetup({
                             <button
                                 type="button"
                                 onClick={() => setSetupGameplay('teams')}
-                                className={`py-2 rounded-lg text-xs font-bold transition ${setupGameplay === 'teams' ? 'bg-neutral-800 text-white shadow' : 'text-neutral-400'
+                                className={`py-2 rounded-lg text-xs font-bold transition duration-300 ${setupGameplay === 'teams'
+                                        ? 'bg-[#ff5722] text-white shadow-md'
+                                        : 'text-zinc-500 hover:text-zinc-300'
                                     }`}
                             >
                                 Team vs Team
@@ -67,24 +75,24 @@ export default function OnlineSetup({
                     </div>
 
                     <div>
-                        <label className="block text-xs font-mono text-neutral-400 uppercase mb-1.5">Your Name</label>
+                        <label className="block text-xs text-zinc-500 uppercase tracking-widest mb-1.5">Your Name</label>
                         <input
                             type="text"
                             maxLength={15}
-                            className="w-full p-3 rounded-xl bg-neutral-800 text-white border border-neutral-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm"
-                            placeholder="Your Name (Host)"
+                            className="w-full p-3 rounded-xl bg-zinc-800 border border-zinc-700 focus:outline-none focus:ring-2 focus:ring-[#ff5722] text-sm text-white"
+                            placeholder="Enter Display Name"
                             value={playerName}
                             onChange={(e) => setPlayerName(e.target.value)}
                         />
                     </div>
 
                     <div>
-                        <label className="block text-xs font-mono text-neutral-400 uppercase mb-1.5">Room ID</label>
+                        <label className="block text-xs text-zinc-500 uppercase tracking-widest mb-1.5">Room ID</label>
                         <div className="flex gap-2">
                             <input
                                 type="text"
                                 maxLength={6}
-                                className="flex-1 p-3 rounded-xl bg-neutral-800 text-white border border-neutral-700 uppercase font-bold text-center tracking-widest focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm"
+                                className="flex-1 p-3 rounded-xl bg-zinc-800 border border-zinc-700 uppercase font-bold text-center tracking-widest focus:outline-none focus:ring-2 focus:ring-[#ff5722] text-sm text-white"
                                 placeholder="CODE"
                                 value={roomInput}
                                 onChange={(e) => setRoomInput(e.target.value.toUpperCase())}
@@ -92,7 +100,7 @@ export default function OnlineSetup({
                             <button
                                 type="button"
                                 onClick={onGenerateCode}
-                                className="bg-neutral-800 hover:bg-neutral-700 text-neutral-300 px-4 rounded-xl border border-neutral-700 text-xs font-semibold active:scale-95 transition"
+                                className="bg-neutral-800 hover:bg-neutral-750 text-neutral-300 px-4 rounded-xl border border-neutral-700 text-xs font-semibold active:scale-95 transition"
                             >
                                 Generate
                             </button>
@@ -101,9 +109,9 @@ export default function OnlineSetup({
 
                     <button
                         onClick={() => onSubmit(roomInput)}
-                        className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-extrabold py-3.5 px-4 rounded-xl active:scale-[0.98] transition mt-2 shadow-lg shadow-yellow-500/10"
+                        className="w-full bg-[#f4f4f5] hover:bg-white text-zinc-950 font-extrabold py-3.5 px-4 rounded-xl transition active:scale-95 text-xs tracking-wider"
                     >
-                        Join Online Lobby
+                        JOIN_MATCH_LOBBY
                     </button>
                 </div>
 

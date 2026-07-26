@@ -40,7 +40,7 @@ export default function Home() {
   const [ytReady, setYtReady] = useState<boolean>(false);
   const playerRef = useRef<any>(null);
 
-  // --- Derived State Variables (Safe top-level scoping) ---
+  // Scoped turn parameters
   const activePlayer = game ? (game.players || []).find((p) => p.id === game.currentTurnPlayerId) : null;
   const myPlayer = game ? (game.players || []).find((p) => p.id === playerId) : null;
   const isMyTurn = game ? game.currentTurnPlayerId === playerId : false;
@@ -48,7 +48,7 @@ export default function Home() {
   const activeModeType = roomId.startsWith('LOC_') ? 'local' : (game ? game.mode : 'online');
   const canPlayActiveTurn = game ? (isMyTurn || activeModeType === 'local') : false;
 
-  // --- Hoisted State Handlers (Safe from Temporal Dead Zone bugs) ---
+  // --- Hoisted State Handlers (TDZ Protected) ---
   function attemptSessionRestoration(targetRoom: string, pId: string, name: string) {
     fetch(`${API_BASE_URL}/api/game?roomId=${targetRoom}`)
       .then((res) => {
@@ -163,6 +163,7 @@ export default function Home() {
       .catch(() => setMessage('Failed to add local player'));
   }
 
+  // Remove player
   function handleRemoveLocalPlayer(targetLocalId: string) {
     fetch(`${API_BASE_URL}/api/game`, {
       method: 'POST',
@@ -183,7 +184,6 @@ export default function Home() {
       .catch((err) => console.error(err));
   }
 
-  // Assign Team assignment
   function handleSelectTeam(targetTeamId: 'A' | 'B') {
     fetch(`${API_BASE_URL}/api/game`, {
       method: 'POST',
@@ -292,7 +292,8 @@ export default function Home() {
       .catch(() => setMessage('Reveal failed.'));
   }
 
-  function resolveTurnWithMetadata(metadataChoice: 'none' | 'artist' | 'title' | 'both') {
+  // Upgraded parameters to pass opponent token recipient IDs [1]
+  function resolveTurnWithMetadata(metadataChoice: 'none' | 'artist' | 'title' | 'both', recipientId?: string) {
     fetch(`${API_BASE_URL}/api/game`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -301,6 +302,7 @@ export default function Home() {
         action: 'resolve',
         playerId,
         metadataGuessed: metadataChoice,
+        metadataRecipientId: recipientId || undefined
       }),
     })
       .then((res) => {
@@ -403,6 +405,32 @@ export default function Home() {
       .catch(() => setMessage('Steal request transmission error.'));
   }
 
+  // Explicit Card purchasing utilizing 3 active tokens [1, 2]
+  function handleBuyCard() {
+    fetch(`${API_BASE_URL}/api/game`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        roomId,
+        action: 'buy_card',
+        playerId
+      })
+    })
+      .then((res) => {
+        if (res.ok) {
+          setMessage('Card purchased with 3 Tokens! Auto-inserted into board.');
+          res.json().then((data) => {
+            setGame(data.game);
+          });
+        } else {
+          res.json().then((data) => {
+            setMessage(data.error);
+          });
+        }
+      })
+      .catch(() => setMessage('Token exchange network error.'));
+  }
+
   function handleLeaveGame() {
     try {
       stopAudio();
@@ -417,7 +445,7 @@ export default function Home() {
     }
   }
 
-  // Dynamic mount and persistent checks
+  // Hydration mount checks
   useEffect(() => {
     let id = localStorage.getItem('hitster_player_id');
     if (!id) {
@@ -619,6 +647,7 @@ export default function Home() {
           onRevealMetadata={revealMetadata}
           onResolveTurnWithMetadata={resolveTurnWithMetadata}
           onSubmitSteal={submitSteal}
+          onBuyCard={handleBuyCard} // Bound purchase hook [1]
           selectedSlot={selectedSlot}
           setSelectedSlot={setSelectedSlot}
           isStealing={isStealing}

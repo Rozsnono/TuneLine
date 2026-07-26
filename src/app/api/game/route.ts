@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/mongodb';
-import Game from '@/models/Game';
-import ReportedSong from '@/models/ReportedSong'; // Import the new model
-import { DECK } from '@/lib/songs';
-
+import Game, { ICard } from '@/models/Game';
+import ReportedSong from '@/models/ReportedSong';
+import { MUSIC_LIBRARY } from '@/lib/songs';
 
 function shuffleDeck(deck: any[]): any[] {
     return [...deck].sort(() => Math.random() - 0.5);
@@ -24,6 +23,7 @@ export async function GET(request: NextRequest) {
             return NextResponse.json({ error: 'Game not found' }, { status: 404 });
         }
 
+        // LOC_ Self-Healing Rule
         if (roomId.startsWith('LOC_')) {
             game.mode = 'local';
         }
@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
             ];
         }
         if (!game.deck || game.deck.length === 0) {
-            game.deck = shuffleDeck(DECK);
+            game.deck = shuffleDeck(MUSIC_LIBRARY);
         }
 
         const gameObj = game.toObject();
@@ -72,7 +72,8 @@ export async function POST(request: NextRequest) {
             gameplayMode,
             teamId,
             selectedIndex,
-            metadataGuessed,
+            metadataGuessed, // 'none' | 'artist' | 'title' | 'both'
+            metadataRecipientId, // Other player/team receiving stolen tokens
             removePlayerId,
             stealerId
         } = body;
@@ -92,7 +93,7 @@ export async function POST(request: NextRequest) {
                     { id: 'A', name: 'Blue Team', timeline: [], score: 0, tokens: 0 },
                     { id: 'B', name: 'Red Team', timeline: [], score: 0, tokens: 0 }
                 ],
-                deck: shuffleDeck(DECK),
+                deck: shuffleDeck(MUSIC_LIBRARY),
                 status: 'waiting',
                 mode: activeMode,
                 gameplayMode: gameplayMode || 'individual'
@@ -103,11 +104,12 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Game not found' }, { status: 404 });
         }
 
+        // Force self-healing mode rules
         if (roomId.startsWith('LOC_')) {
             game.mode = 'local';
         }
 
-        // Defensive State Healing
+        // DEFENSIVE STATE HEALING (Guarantees robust arrays)
         if (!game.players) game.players = [];
         if (!game.teams || game.teams.length === 0) {
             game.teams = [
@@ -116,7 +118,7 @@ export async function POST(request: NextRequest) {
             ];
         }
         if (!game.deck || game.deck.length === 0) {
-            game.deck = shuffleDeck(DECK);
+            game.deck = shuffleDeck(MUSIC_LIBRARY);
         }
 
         // ACTION: Join room
@@ -194,7 +196,7 @@ export async function POST(request: NextRequest) {
                 }
             }
 
-            const deck = shuffleDeck(DECK);
+            const deck = shuffleDeck(MUSIC_LIBRARY);
 
             if (game.gameplayMode === 'teams') {
                 const starterA = deck.pop();
@@ -318,22 +320,47 @@ export async function POST(request: NextRequest) {
 
             if (!boardOwner.timeline) boardOwner.timeline = [];
 
-            // 1. Process Timeline Card insertion
+            // 1. Process Timeline Card insertion (Only if guessed correctly)
             if (game.lastGuessCorrect && game.lastGuessIndex !== null) {
                 boardOwner.timeline.splice(game.lastGuessIndex, 0, activeCard);
                 boardOwner.score = boardOwner.timeline.length;
             }
 
-            // 2. Process Granular Token metadata rewards
-            let awardedTokens = 0;
+            // 2. Process Granular Token metadata rewards for active player
+            let activeAwardedTokens = 0;
             if (metadataGuessed === 'artist' || metadataGuessed === 'title') {
-                awardedTokens = 1;
+                activeAwardedTokens = 1;
             } else if (metadataGuessed === 'both') {
-                awardedTokens = 2;
+                activeAwardedTokens = 2;
             }
 
-            boardOwner.tokens = (boardOwner.tokens || 0) + awardedTokens;
+            boardOwner.tokens = (boardOwner.tokens || 0) + activeAwardedTokens;
 
+            // 3. Process Stolen remaining tokens to chosen opponent
+            const remainingTokens = 2 - activeAwardedTokens;
+            if (remainingTokens > 0 && metadataRecipientId) {
+                let recipient: any;
+                if (game.gameplayMode === 'teams') {
+                    recipient = game.teams.find((t: any) => t.id === metadataRecipientId);
+                } else {
+                    recipient = game.players.find((p: any) => p.id === metadataRecipientId);
+                }
+
+                if (recipient) {
+                    recipient.tokens = (recipient.tokens || 0) + remainingTokens;
+
+                    // Opponent token trade-in check
+                    if (recipient.tokens >= 3) {
+                        recipient.tokens -= 3;
+                        // Place automatically in correct spot
+                        recipient.timeline.push(activeCard);
+                        recipient.timeline.sort((a: any, b: any) => a.year - b.year);
+                        recipient.score = recipient.timeline.length;
+                    }
+                }
+            }
+
+            // Active player token trade-in check
             if (boardOwner.tokens >= 3) {
                 boardOwner.tokens -= 3;
                 if (!game.lastGuessCorrect) {
@@ -343,7 +370,7 @@ export async function POST(request: NextRequest) {
                 }
             }
 
-            // 3. Evaluate Win Parameters
+            // 4. Evaluate Win Parameters
             if (boardOwner.score >= 5) {
                 game.status = 'finished';
                 game.winnerId = game.gameplayMode === 'teams' ? game.currentTurnTeamId : game.currentTurnPlayerId;
@@ -454,7 +481,7 @@ export async function POST(request: NextRequest) {
             }
         }
 
-        // ACTION: Report Broken / Skip Song (High-Sustaining Skip)
+        // ACTION: Report Broken / Skip Song
         else if (action === 'report_broken') {
             if (game.status !== 'playing') {
                 return NextResponse.json({ error: 'Game is not active.' }, { status: 400 });
@@ -468,23 +495,61 @@ export async function POST(request: NextRequest) {
                 return NextResponse.json({ error: 'No song active to report.' }, { status: 400 });
             }
 
-            // Log the broken track metrics permanently in MongoDB
             await ReportedSong.create({
                 songId: activeCard.id,
                 title: activeCard.title,
                 artist: activeCard.artist,
-                year: activeCard.year || 0, // In DB this holds the true year (non-redacted)
+                year: activeCard.year || 0,
                 youtubeId: activeCard.youtubeId,
                 roomId: game.roomId
             });
 
-            // Draw next card
             game.currentCard = game.deck.pop() || null;
-
-            // Keep turn on active player but reset timeline slots
             game.phase = 'placement';
             game.lastGuessCorrect = null;
             game.lastGuessIndex = null;
+
+            await game.save();
+        }
+
+        // ACTION: Buy card explicitly with 3 tokens [1, 2]
+        else if (action === 'buy_card') {
+            let boardOwner: any;
+            if (game.gameplayMode === 'teams') {
+                const player = game.players.find((p: any) => p.id === playerId);
+                if (!player || !player.teamId) {
+                    return NextResponse.json({ error: 'You must join a team to buy cards.' }, { status: 400 });
+                }
+                boardOwner = game.teams.find((t: any) => t.id === player.teamId);
+            } else {
+                boardOwner = game.players.find((p: any) => p.id === playerId);
+            }
+
+            if (!boardOwner) {
+                return NextResponse.json({ error: 'Board owner not found' }, { status: 400 });
+            }
+
+            if (boardOwner.tokens < 3) {
+                return NextResponse.json({ error: 'Not enough tokens. Cost: 3 Tokens.' }, { status: 400 });
+            }
+
+            // Deduct 3 tokens [1]
+            boardOwner.tokens -= 3;
+
+            // Draw and auto-sort the purchased card chronologically [1, 2]
+            const purchasedCard = game.deck.pop();
+            if (purchasedCard) {
+                if (!boardOwner.timeline) boardOwner.timeline = [];
+                boardOwner.timeline.push(purchasedCard);
+                boardOwner.timeline.sort((a: ICard, b: ICard) => a.year - b.year);
+                boardOwner.score = boardOwner.timeline.length;
+            }
+
+            // Check win boundaries
+            if (boardOwner.score >= 5) {
+                game.status = 'finished';
+                game.winnerId = game.gameplayMode === 'teams' ? boardOwner.id : boardOwner.id;
+            }
 
             await game.save();
         }
