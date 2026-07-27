@@ -1,5 +1,6 @@
 'use client';
 
+import { motion } from 'framer-motion';
 import { Sparkles, Tv, Smartphone } from 'lucide-react';
 
 interface ModeSelectionProps {
@@ -9,10 +10,14 @@ interface ModeSelectionProps {
 export default function ModeSelection({ onSelect }: ModeSelectionProps) {
     return (
         <div className="flex flex-col min-h-screen bg-[#050508] text-white px-6 pt-14 pb-12 justify-between relative overflow-hidden font-mono select-none">
-            {/* Dynamic Background Ambient Glow Orbs */}
+            {/* Background Ambient Glow Orb */}
             <div className="absolute top-[5%] left-[5%] w-[60%] h-[50%] bg-[#ff5722]/5 rounded-full blur-[120px] pointer-events-none"></div>
 
-            <div className="text-center space-y-4">
+            <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-center space-y-4"
+            >
                 <span className="text-[10px] font-bold tracking-widest text-[#ff5722] uppercase flex items-center justify-center gap-1.5 bg-orange-500/10 px-3.5 py-1 rounded-full w-max mx-auto border border-orange-500/20 shadow-[0_0_15px_rgba(255,87,34,0.1)]">
                     <Sparkles className="w-3.5 h-3.5 animate-pulse" /> CONFIG_SELECTOR
                 </span>
@@ -22,7 +27,7 @@ export default function ModeSelection({ onSelect }: ModeSelectionProps) {
                 <p className="text-zinc-500 text-xs max-w-[280px] mx-auto font-sans leading-relaxed">
                     Challenge your friends in a high-stakes, real-time chronological battle.
                 </p>
-            </div>
+            </motion.div>
 
             <div className="grid grid-cols-1 gap-4">
                 <button

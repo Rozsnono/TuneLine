@@ -25,11 +25,10 @@ export default function MusicPlayer({
     onReportBroken,
 }: MusicPlayerProps) {
     return (
-        <div className="bg-zinc-900 p-6 rounded-3xl border border-zinc-800 shadow-xl flex flex-col items-center">
-            {/* Enlarged Turntable Deck Container (Scaled up to w-56 h-56) */}
+        <div className="w-full flex flex-col items-center py-4 select-none">
             <div className="relative w-56 h-56 flex items-center justify-center mb-6">
 
-                {/* ROTATING VINYL RECORD (Sits behind the static central play button) */}
+                {/* ROTATING VINYL RECORD (Sits directly on page background) */}
                 <div
                     className="absolute w-56 h-56 rounded-full border-4 border-zinc-800 shadow-[0_12px_45px_rgba(0,0,0,0.75)] overflow-hidden animate-spin [animation-duration:6s]"
                     style={{
@@ -37,14 +36,14 @@ export default function MusicPlayer({
                         animationPlayState: isPlaying ? 'running' : 'paused',
                     }}
                 >
-                    {/* Concentric Platter Grooves (Re-mapped to fit the larger platter) */}
+                    {/* Concentric Platter Grooves */}
                     <div className="absolute inset-2.5 rounded-full border border-zinc-900/60"></div>
                     <div className="absolute inset-6 rounded-full border border-[#111113] border-dashed"></div>
                     <div className="absolute inset-10 rounded-full border border-zinc-900/50"></div>
                     <div className="absolute inset-16 rounded-full border border-zinc-900/40"></div>
                     <div className="absolute inset-20 rounded-full border border-zinc-900/30"></div>
 
-                    {/* Asymmetrical High-Contrast Marker Dot (Positions adjusted for larger radius) */}
+                    {/* Asymmetrical High-Contrast Marker Dot */}
                     <div className="absolute top-6 right-16 w-3 h-3 rounded-full bg-orange-500/70 shadow-[0_0_10px_rgba(255,87,34,0.6)]"></div>
                 </div>
 
@@ -63,25 +62,36 @@ export default function MusicPlayer({
                 </div>
             </div>
 
-            {/* --- Phase-Dependent Control Outputs --- */}
+            {/* --- Minimalist Phase Outputs --- */}
+            {game.phase === 'placement' && (
+                game.isTokenPurchase && game.currentCard ? (
+                    <div className="text-center mb-4 w-full animate-fade-in">
+                        <div className="bg-zinc-950/40 border border-zinc-900 p-4 rounded-2xl text-left font-sans">
+                            <span className="text-[9px] text-orange-500 font-mono uppercase tracking-wider font-bold">✦ Token Card Purchased ✦</span>
+                            <h3 className="text-base font-black text-white truncate">{game.currentCard.title}</h3>
+                            <p className="text-zinc-400 text-xs font-semibold truncate mt-0.5">{game.currentCard.artist}</p>
+                            <div className="pt-2">
+                                <span className="text-[10px] bg-gradient-to-r from-orange-500 to-[#b45309] text-white px-2.5 py-0.5 rounded font-mono font-bold">
+                                    Year: {game.currentCard.year}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                ) : null
+            )}
 
-            {/* Phase 1 (Placement): Completely minimalist setup, displaying zero text descriptors */}
-            {game.phase === 'placement' && null}
-
-            {/* Phase 2 (Trivia Guessing): Simplified, brief monospaced instruction */}
             {game.phase === 'metadata_guess' && (
-                <div className="text-center mb-4">
+                <div className="text-center mb-2 animate-pulse">
                     <span className="text-[10px] font-bold tracking-widest text-[#ff5722] uppercase">
                         ✦ GUESS ARTIST &amp; TITLE ✦
                     </span>
                 </div>
             )}
 
-            {/* Phase 3 (Revealed Answer Panel) */}
             {game.phase === 'revealed' && (
-                <div className="text-center mb-4 w-full">
-                    <div className="bg-zinc-950 p-4 rounded-2xl border border-zinc-855 mt-1 text-left">
-                        <span className="text-[9px] text-zinc-500 font-mono uppercase tracking-wider">Song Info</span>
+                <div className="text-center mb-2 w-full animate-fade-in">
+                    <div className="bg-zinc-950/40 border border-zinc-900 p-4 rounded-2xl text-left">
+                        <span className="text-[9px] text-zinc-500 font-mono uppercase tracking-wider font-bold">Song Info</span>
                         <h3 className="text-base font-black text-white truncate font-sans">{game.currentCard?.title}</h3>
                         <p className="text-[#ff5722] text-xs font-semibold truncate font-sans">{game.currentCard?.artist}</p>
                         <div className="pt-2">
@@ -97,7 +107,7 @@ export default function MusicPlayer({
             {canPlayActiveTurn && game.status === 'playing' && (
                 <button
                     onClick={onReportBroken}
-                    className="mt-2 text-[9px] uppercase tracking-wider text-zinc-500 hover:text-red-400 flex items-center gap-1.5 transition active:scale-95"
+                    className="mt-4 text-[9px] uppercase tracking-wider text-zinc-500 hover:text-red-400 flex items-center gap-1.5 transition active:scale-95"
                 >
                     <AlertTriangle className="w-3.5 h-3.5 text-yellow-600" /> [ SKIP_BROKEN_SONG ]
                 </button>

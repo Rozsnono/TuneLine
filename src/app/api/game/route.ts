@@ -43,13 +43,14 @@ export async function GET(request: NextRequest) {
         const gameObj = game.toObject();
         gameObj.mode = roomId.startsWith('LOC_') ? 'local' : gameObj.mode;
 
-        if (gameObj.currentCard && gameObj.status === 'playing' && gameObj.phase !== 'revealed') {
+        // Exclude redaction of currentCard.year ONLY if it is a purchased card
+        if (gameObj.currentCard && gameObj.status === 'playing' && gameObj.phase !== 'revealed' && !gameObj.isTokenPurchase) {
             gameObj.currentCard = {
                 id: gameObj.currentCard.id,
                 youtubeId: gameObj.currentCard.youtubeId,
                 title: 'Secret Song',
                 artist: 'Secret Artist',
-                year: 0
+                year: null
             };
         }
 
@@ -102,7 +103,8 @@ export async function POST(request: NextRequest) {
                 gameplayMode: gameplayMode || 'individual',
                 targetScore: targetScore || 10,
                 maxPlayersPerTeam: maxPlayersPerTeam || 4,
-                maxPlayTime: maxPlayTime || 15
+                maxPlayTime: maxPlayTime || 15,
+                isTokenPurchase: false
             });
         }
 
@@ -229,11 +231,16 @@ export async function POST(request: NextRequest) {
                 }
             }
 
-            const deck = shuffleDeck(MUSIC_LIBRARY);
+            const freshDeck = shuffleDeck(MUSIC_LIBRARY);
+
+            game.winnerId = null;
+            game.lastGuessCorrect = null;
+            game.lastGuessIndex = null;
+            game.isTokenPurchase = false;
 
             if (game.gameplayMode === 'teams') {
-                const starterA = deck.pop();
-                const starterB = deck.pop();
+                const starterA = freshDeck.pop();
+                const starterB = freshDeck.pop();
 
                 const teamA = game.teams.find((t: any) => t.id === 'A');
                 const teamB = game.teams.find((t: any) => t.id === 'B');
@@ -241,10 +248,12 @@ export async function POST(request: NextRequest) {
                 if (teamA && starterA) {
                     teamA.timeline = [starterA];
                     teamA.score = 1;
+                    teamA.tokens = 0;
                 }
                 if (teamB && starterB) {
                     teamB.timeline = [starterB];
                     teamB.score = 1;
+                    teamB.tokens = 0;
                 }
 
                 game.currentTurnTeamId = 'A';
@@ -253,23 +262,22 @@ export async function POST(request: NextRequest) {
 
             } else {
                 for (const player of game.players) {
-                    const starterCard = deck.pop();
+                    const starterCard = freshDeck.pop();
                     if (starterCard) {
                         player.timeline = [starterCard];
                         player.score = 1;
+                        player.tokens = 0;
                     }
                 }
                 game.currentTurnPlayerId = game.players[0].id;
+                game.currentTurnTeamId = null;
             }
 
-            game.deck = deck;
-            game.currentCard = deck.pop() || null;
+            game.currentCard = freshDeck.pop() || null;
+            game.deck = freshDeck;
             game.status = 'playing';
             game.phase = 'placement';
-            game.lastGuessCorrect = null;
-            game.lastGuessIndex = null;
 
-            // Force write nested parameters to avoid MongoDB race locks [1]
             game.markModified('currentCard');
             game.markModified('deck');
             game.markModified('players');
@@ -277,7 +285,7 @@ export async function POST(request: NextRequest) {
             await game.save();
         }
 
-        // ACTION: Lock Timeline Guess
+        // ACTION: Lock Timeline Guess (Standard Or Token Purchase Evaluation)
         else if (action === 'guess') {
             if (game.status !== 'playing') {
                 return NextResponse.json({ error: 'Game is not active.' }, { status: 400 });
@@ -313,12 +321,68 @@ export async function POST(request: NextRequest) {
                 isCorrect = activeCard.year >= (beforeCard?.year || 0) && activeCard.year <= (afterCard?.year || 0);
             }
 
-            game.lastGuessCorrect = isCorrect;
-            game.lastGuessIndex = selectedIndex;
-            game.phase = 'metadata_guess';
+            if (game.isTokenPurchase) {
+                if (isCorrect) {
+                    let boardOwner: any;
+                    if (game.gameplayMode === 'teams') {
+                        boardOwner = game.teams.find((t: any) => t.id === game.currentTurnTeamId);
+                    } else {
+                        boardOwner = game.players.find((p: any) => p.id === game.currentTurnPlayerId);
+                    }
 
-            game.markModified('players');
-            await game.save();
+                    if (boardOwner) {
+                        if (!boardOwner.timeline) boardOwner.timeline = [];
+                        boardOwner.timeline.splice(selectedIndex, 0, activeCard);
+                        boardOwner.score = boardOwner.timeline.length;
+                    }
+
+                    game.isTokenPurchase = false;
+
+                    const winGoal = game.targetScore || 10;
+                    if (boardOwner && boardOwner.score >= winGoal) {
+                        game.status = 'finished';
+                        game.winnerId = game.gameplayMode === 'teams' ? game.currentTurnTeamId : game.currentTurnPlayerId;
+                    } else {
+                        if (game.deck.length === 0) {
+                            game.deck = shuffleDeck(MUSIC_LIBRARY);
+                        }
+                        game.currentCard = game.deck.pop() || null;
+                        game.phase = 'placement';
+
+                        if (game.gameplayMode === 'teams') {
+                            const nextTeamId: 'A' | 'B' = game.currentTurnTeamId === 'A' ? 'B' : 'A';
+                            game.currentTurnTeamId = nextTeamId;
+                            const nextTeamPlayers = game.players.filter((p: any) => p.teamId === nextTeamId);
+                            if (nextTeamPlayers.length > 0) {
+                                const currentPlayerIdxOnTeam = nextTeamPlayers.findIndex((p: any) => p.id === game.currentTurnPlayerId);
+                                const nextPlayerIdx = (currentPlayerIdxOnTeam + 1) % nextTeamPlayers.length;
+                                game.currentTurnPlayerId = nextTeamPlayers[nextPlayerIdx].id;
+                            } else {
+                                const currentIdx = game.players.findIndex((p: any) => p.id === game.currentTurnPlayerId);
+                                game.currentTurnPlayerId = game.players[(currentIdx + 1) % game.players.length].id;
+                            }
+                        } else {
+                            const currentIdx = game.players.findIndex((p: any) => p.id === game.currentTurnPlayerId);
+                            game.currentTurnPlayerId = game.players[(currentIdx + 1) % game.players.length].id;
+                        }
+                    }
+
+                    game.markModified('currentCard');
+                    game.markModified('deck');
+                    game.markModified('players');
+                    game.markModified('teams');
+                    await game.save();
+                } else {
+                    return NextResponse.json({ error: 'Incorrect timeline slot! Try again (the year is visible).' }, { status: 400 });
+                }
+            } else {
+                game.lastGuessCorrect = isCorrect;
+                game.lastGuessIndex = selectedIndex;
+                game.phase = 'metadata_guess';
+
+                game.markModified('players');
+                await game.save();
+            }
         }
 
         // ACTION: Reveal Metadata
@@ -334,7 +398,7 @@ export async function POST(request: NextRequest) {
             await game.save();
         }
 
-        // ACTION: Resolve guess state and swap active turns
+        // ACTION: Resolve guess state and swap active turns (All automatic deductions completely removed) [1]
         else if (action === 'resolve') {
             if (game.status !== 'playing') {
                 return NextResponse.json({ error: 'Game is not active.' }, { status: 400 });
@@ -377,7 +441,7 @@ export async function POST(request: NextRequest) {
 
             boardOwner.tokens = (boardOwner.tokens || 0) + awardedTokens;
 
-            // 3. Process Stolen remaining tokens
+            // 3. Process Stolen remaining tokens (No automatic trade-ins) [1]
             const remainingTokens = 2 - awardedTokens;
             if (remainingTokens > 0 && metadataRecipientId) {
                 let recipient: any;
@@ -389,26 +453,10 @@ export async function POST(request: NextRequest) {
 
                 if (recipient) {
                     recipient.tokens = (recipient.tokens || 0) + remainingTokens;
-
-                    if (recipient.tokens >= 3) {
-                        recipient.tokens -= 3;
-                        recipient.timeline.push(activeCard);
-                        recipient.timeline.sort((a: any, b: any) => a.year - b.year);
-                        recipient.score = recipient.timeline.length;
-                    }
                 }
             }
 
-            if (boardOwner.tokens >= 3) {
-                boardOwner.tokens -= 3;
-                if (!game.lastGuessCorrect) {
-                    boardOwner.timeline.push(activeCard);
-                    boardOwner.timeline.sort((a: any, b: any) => a.year - b.year);
-                    boardOwner.score = boardOwner.timeline.length;
-                }
-            }
-
-            // 4. Evaluate Win Parameters: DYNAMIC EVALUATION [2]
+            // 4. Evaluate Win Parameters
             const winGoal = game.targetScore || 10;
             if (boardOwner.score >= winGoal) {
                 game.status = 'finished';
@@ -489,7 +537,6 @@ export async function POST(request: NextRequest) {
                 stealerBoard.timeline.splice(selectedIndex, 0, activeCard);
                 stealerBoard.score = stealerBoard.timeline.length;
 
-                // DYNAMIC EVALUATION [2]
                 const winGoal = game.targetScore || 10;
                 if (stealerBoard.score >= winGoal) {
                     game.status = 'finished';
@@ -518,7 +565,6 @@ export async function POST(request: NextRequest) {
                     }
                 }
 
-                // Force write modified tags before saving [1]
                 game.markModified('currentCard');
                 game.markModified('deck');
                 game.markModified('players');
@@ -528,7 +574,6 @@ export async function POST(request: NextRequest) {
             } else {
                 stealerBoard.tokens = Math.max(0, (stealerBoard.tokens || 0) - 1);
 
-                // Force write modified tags before saving [1]
                 game.markModified('players');
                 game.markModified('teams');
                 await game.save();
@@ -536,7 +581,7 @@ export async function POST(request: NextRequest) {
             }
         }
 
-        // ACTION: Report Broken / Skip Song (With instant-tracking save guarantees) [1]
+        // ACTION: Report Broken / Skip Song
         else if (action === 'report_broken') {
             if (game.status !== 'playing') {
                 return NextResponse.json({ error: 'Game is not active.' }, { status: 400 });
@@ -561,28 +606,39 @@ export async function POST(request: NextRequest) {
                 roomId: game.roomId
             });
 
+            if (game.deck.length === 0) {
+                game.deck = shuffleDeck(MUSIC_LIBRARY);
+            }
             game.currentCard = game.deck.pop() || null;
             game.phase = 'placement';
             game.lastGuessCorrect = null;
             game.lastGuessIndex = null;
 
-            // Force write modified tags before saving [1]
             game.markModified('currentCard');
             game.markModified('deck');
             await game.save();
         }
 
-        // ACTION: Buy card explicitly with 3 tokens [1, 2]
+        // ACTION: Buy card explicitly with 3 tokens
         else if (action === 'buy_card') {
             let boardOwner: any;
-            if (game.gameplayMode === 'teams') {
-                const player = game.players.find((p: any) => p.id === playerId);
-                if (!player || !player.teamId) {
-                    return NextResponse.json({ error: 'You must join a team to buy cards.' }, { status: 400 });
+
+            if (game.mode === 'local') {
+                if (game.gameplayMode === 'teams') {
+                    boardOwner = game.teams.find((t: any) => t.id === game.currentTurnTeamId);
+                } else {
+                    boardOwner = game.players.find((p: any) => p.id === game.currentTurnPlayerId);
                 }
-                boardOwner = game.teams.find((t: any) => t.id === player.teamId);
             } else {
-                boardOwner = game.players.find((p: any) => p.id === playerId);
+                if (game.gameplayMode === 'teams') {
+                    const player = game.players.find((p: any) => p.id === playerId);
+                    if (!player || !player.teamId) {
+                        return NextResponse.json({ error: 'You must join a team to buy cards.' }, { status: 400 });
+                    }
+                    boardOwner = game.teams.find((t: any) => t.id === player.teamId);
+                } else {
+                    boardOwner = game.players.find((p: any) => p.id === playerId);
+                }
             }
 
             if (!boardOwner) {
@@ -595,22 +651,15 @@ export async function POST(request: NextRequest) {
 
             boardOwner.tokens -= 3;
 
-            const purchasedCard = game.deck.pop();
-            if (purchasedCard) {
-                if (!boardOwner.timeline) boardOwner.timeline = [];
-                boardOwner.timeline.push(purchasedCard);
-                boardOwner.timeline.sort((a: ICard, b: ICard) => a.year - b.year);
-                boardOwner.score = boardOwner.timeline.length;
+            if (game.deck.length === 0) {
+                game.deck = shuffleDeck(MUSIC_LIBRARY);
             }
+            const purchasedCard = game.deck.pop() || null;
 
-            // DYNAMIC EVALUATION [2]
-            const winGoal = game.targetScore || 10;
-            if (boardOwner.score >= winGoal) {
-                game.status = 'finished';
-                game.winnerId = game.gameplayMode === 'teams' ? boardOwner.id : boardOwner.id;
-            }
+            game.currentCard = purchasedCard;
+            game.isTokenPurchase = true;
+            game.phase = 'placement';
 
-            // Force write modified tags before saving [1]
             game.markModified('currentCard');
             game.markModified('deck');
             game.markModified('players');

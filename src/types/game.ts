@@ -38,4 +38,5 @@ export interface GameState {
     lastGuessIndex: number | null;
     winnerId: string | null;
     maxPlayTime: number;
+    isTokenPurchase: boolean;
 }

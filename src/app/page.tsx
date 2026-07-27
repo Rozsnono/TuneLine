@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { GameState } from '@/types/game';
+import { motion, AnimatePresence } from 'framer-motion'; // Clean spring transitions [1]
 
 // Modular view components
 import ModeSelection from '@/components/ModeSelection';
@@ -44,7 +45,7 @@ export default function Home() {
   const [ytReady, setYtReady] = useState<boolean>(false);
   const playerRef = useRef<any>(null);
 
-  // Scoped turn parameters
+  // Scoped turn parameters (safe optional checks)
   const activePlayer = game ? (game.players || []).find((p) => p.id === game.currentTurnPlayerId) : null;
   const myPlayer = game ? (game.players || []).find((p) => p.id === playerId) : null;
   const isMyTurn = game ? game.currentTurnPlayerId === playerId : false;
@@ -52,7 +53,7 @@ export default function Home() {
   const activeModeType = roomId.startsWith('LOC_') ? 'local' : (game ? game.mode : 'online');
   const canPlayActiveTurn = game ? (isMyTurn || activeModeType === 'local') : false;
 
-  // --- NEW: High-performance auto play-limit stopwatch hook [1] ---
+  // --- High-performance auto play-limit stopwatch hook [1] ---
   useEffect(() => {
     let stopwatch: any;
     if (isPlaying && game?.maxPlayTime) {
@@ -133,9 +134,9 @@ export default function Home() {
         playerName: activeName,
         mode: activeMode,
         gameplayMode: setupGameplay,
-        targetScore,          // Passes customizable goal settings [2]
-        maxPlayersPerTeam,    // Passes team members capacity [2]
-        maxPlayTime           // Passes song playback caps [1]
+        targetScore,
+        maxPlayersPerTeam,
+        maxPlayTime
       }),
     })
       .then((res) => {
@@ -165,6 +166,7 @@ export default function Home() {
     handleJoinOrCreate(localCode, 'local');
   }
 
+  // Add Local Player
   function handleAddLocalPlayer() {
     if (!localInputName.trim()) return;
     fetch(`${API_BASE_URL}/api/game`, {
@@ -462,6 +464,7 @@ export default function Home() {
       .catch(() => setMessage('Token exchange network error.'));
   }
 
+  // RESTORED: handleLeaveGame is now fully defined [1]
   function handleLeaveGame() {
     try {
       stopAudio();
@@ -598,105 +601,165 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#010103] flex justify-center items-center">
+      {/* CENTRAL MOBILE VIEWPORT WRAPPER [1] */}
       <div className="w-full max-w-md min-h-screen bg-[#050508] shadow-[0_0_80px_rgba(0,0,0,0.85)] md:border-x md:border-zinc-900/60 relative flex flex-col overflow-hidden justify-between">
 
         {/* Permanent, static hidden YouTube target container on the DOM */}
         <div id="youtube-audio-player" className="hidden pointer-events-none w-0 h-0 absolute"></div>
 
-        {playModeSelection === null && <ModeSelection onSelect={setPlayModeSelection} />}
+        {/* ANIMATED ROUTER TRANSITIONS [1] */}
+        <AnimatePresence mode="wait">
+          {playModeSelection === null && (
+            <motion.div
+              key="modeSelectionScreen"
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -30 }}
+              transition={{ duration: 0.25, ease: 'easeInOut' }}
+              className="flex-grow flex flex-col h-full w-full justify-between"
+            >
+              <ModeSelection onSelect={setPlayModeSelection} />
+            </motion.div>
+          )}
 
-        {playModeSelection === 'local' && !hasJoined && (
-          <LocalSetup
-            setupGameplay={setupGameplay}
-            setSetupGameplay={setSetupGameplay}
-            targetScore={targetScore}
-            setTargetScore={setTargetScore}
-            maxPlayersPerTeam={maxPlayersPerTeam}
-            setMaxPlayersPerTeam={setMaxPlayersPerTeam}
-            maxPlayTime={maxPlayTime}
-            setMaxPlayTime={setMaxPlayTime}
-            onBack={() => setPlayModeSelection(null)}
-            onSubmit={handleCreateLocalSession}
-            message={message}
-          />
-        )}
+          {playModeSelection === 'local' && !hasJoined && (
+            <motion.div
+              key="localSetupScreen"
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -30 }}
+              transition={{ duration: 0.25, ease: 'easeInOut' }}
+              className="flex-grow flex flex-col h-full w-full justify-between"
+            >
+              <LocalSetup
+                setupGameplay={setupGameplay}
+                setSetupGameplay={setSetupGameplay}
+                targetScore={targetScore}
+                setTargetScore={setTargetScore}
+                maxPlayersPerTeam={maxPlayersPerTeam}
+                setMaxPlayersPerTeam={setMaxPlayersPerTeam}
+                maxPlayTime={maxPlayTime}
+                setMaxPlayTime={setMaxPlayTime}
+                onBack={() => setPlayModeSelection(null)}
+                onSubmit={handleCreateLocalSession}
+                message={message}
+              />
+            </motion.div>
+          )}
 
-        {playModeSelection === 'online' && !hasJoined && (
-          <OnlineSetup
-            setupGameplay={setupGameplay}
-            setSetupGameplay={setSetupGameplay}
-            playerName={playerName}
-            setPlayerName={setPlayerName}
-            roomInput={roomInput}
-            setRoomInput={setRoomInput}
-            onGenerateCode={generateRoomCode}
-            onBack={() => setPlayModeSelection(null)}
-            onSubmit={handleJoinOrCreate}
-            message={message}
-          />
-        )}
+          {playModeSelection === 'online' && !hasJoined && (
+            <motion.div
+              key="onlineSetupScreen"
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -30 }}
+              transition={{ duration: 0.25, ease: 'easeInOut' }}
+              className="flex-grow flex flex-col h-full w-full justify-between"
+            >
+              <OnlineSetup
+                setupGameplay={setupGameplay}
+                setSetupGameplay={setSetupGameplay}
+                playerName={playerName}
+                setPlayerName={setPlayerName}
+                roomInput={roomInput}
+                setRoomInput={setRoomInput}
+                onGenerateCode={generateRoomCode}
+                onBack={() => setPlayModeSelection(null)}
+                onSubmit={handleJoinOrCreate}
+                message={message}
+              />
+            </motion.div>
+          )}
 
-        {hasJoined && game && game.status === 'waiting' && (
-          <WaitingLobby
-            game={game}
-            playerId={playerId}
-            isHost={isHost}
-            activeModeType={activeModeType}
-            localInputName={localInputName}
-            setLocalInputName={setLocalInputName}
-            localInputTeam={localInputTeam}
-            setLocalInputTeam={setLocalInputTeam}
-            myPlayer={myPlayer as any}
-            copied={copied}
-            message={message}
-            onLeave={handleLeaveGame}
-            onCopyRoomCode={copyRoomCode}
-            onAddLocalPlayer={handleAddLocalPlayer}
-            onRemoveLocalPlayer={handleRemoveLocalPlayer}
-            onSelectTeam={handleSelectTeam}
-            onStartGame={handleStartGame}
-          />
-        )}
+          {hasJoined && game && game.status === 'waiting' && (
+            <motion.div
+              key="lobbyScreen"
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -30 }}
+              transition={{ duration: 0.25, ease: 'easeInOut' }}
+              className="flex-grow flex flex-col h-full w-full justify-between"
+            >
+              <WaitingLobby
+                game={game}
+                playerId={playerId}
+                isHost={isHost}
+                activeModeType={activeModeType}
+                localInputName={localInputName}
+                setLocalInputName={setLocalInputName}
+                localInputTeam={localInputTeam}
+                setLocalInputTeam={setLocalInputTeam}
+                myPlayer={myPlayer as any}
+                copied={copied}
+                message={message}
+                onLeave={handleLeaveGame}
+                onCopyRoomCode={copyRoomCode}
+                onAddLocalPlayer={handleAddLocalPlayer}
+                onRemoveLocalPlayer={handleRemoveLocalPlayer}
+                onSelectTeam={handleSelectTeam}
+                onStartGame={handleStartGame}
+              />
+            </motion.div>
+          )}
 
-        {hasJoined && game && game.status === 'finished' && (
-          <Finished
-            game={game}
-            isHost={isHost}
-            activeModeType={activeModeType}
-            onRestart={handleStartGame}
-            onLeave={handleLeaveGame}
-          />
-        )}
+          {hasJoined && game && game.status === 'finished' && (
+            <motion.div
+              key="finishedScreen"
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -30 }}
+              transition={{ duration: 0.25, ease: 'easeInOut' }}
+              className="flex-grow flex flex-col h-full w-full justify-between"
+            >
+              <Finished
+                game={game}
+                isHost={isHost}
+                activeModeType={activeModeType}
+                onRestart={handleStartGame}
+                onLeave={handleLeaveGame}
+              />
+            </motion.div>
+          )}
 
-        {hasJoined && game && game.status === 'playing' && (
-          <GamePlay
-            game={game}
-            playerId={playerId}
-            activeModeType={activeModeType}
-            isMyTurn={isMyTurn}
-            activePlayer={activePlayer as any}
-            myPlayer={myPlayer as any}
-            canPlayActiveTurn={canPlayActiveTurn}
-            isPlaying={isPlaying}
-            playerRef={playerRef}
-            onToggleAudio={toggleAudio}
-            onStopAudio={stopAudio}
-            onReportBroken={reportBrokenSong}
-            onSubmitPlacement={submitPlacement}
-            onRevealMetadata={revealMetadata}
-            onResolveTurnWithMetadata={resolveTurnWithMetadata}
-            onSubmitSteal={submitSteal}
-            onBuyCard={handleBuyCard}
-            selectedSlot={selectedSlot}
-            setSelectedSlot={setSelectedSlot}
-            isStealing={isStealing}
-            setIsStealing={setIsStealing}
-            localStealerId={localStealerId}
-            setLocalStealerId={setLocalStealerId}
-            message={message}
-            onLeaveGame={handleLeaveGame}
-          />
-        )}
+          {hasJoined && game && game.status === 'playing' && (
+            <motion.div
+              key="gameplayScreen"
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -30 }}
+              transition={{ duration: 0.25, ease: 'easeInOut' }}
+              className="flex-grow flex flex-col h-full w-full justify-between"
+            >
+              <GamePlay
+                game={game}
+                playerId={playerId}
+                activeModeType={activeModeType}
+                isMyTurn={isMyTurn}
+                activePlayer={activePlayer as any}
+                myPlayer={myPlayer as any}
+                canPlayActiveTurn={canPlayActiveTurn}
+                isPlaying={isPlaying}
+                playerRef={playerRef}
+                onToggleAudio={toggleAudio}
+                onStopAudio={stopAudio}
+                onReportBroken={reportBrokenSong}
+                onSubmitPlacement={submitPlacement}
+                onRevealMetadata={revealMetadata}
+                onResolveTurnWithMetadata={resolveTurnWithMetadata}
+                onSubmitSteal={submitSteal}
+                onBuyCard={handleBuyCard}
+                selectedSlot={selectedSlot}
+                setSelectedSlot={setSelectedSlot}
+                isStealing={isStealing}
+                setIsStealing={setIsStealing}
+                localStealerId={localStealerId}
+                setLocalStealerId={setLocalStealerId}
+                message={message}
+                onLeaveGame={handleLeaveGame}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

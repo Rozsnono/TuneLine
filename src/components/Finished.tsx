@@ -57,11 +57,11 @@ export default function Finished({
                 )}
                 <button
                     onClick={onLeave}
-                    className="w-full bg-zinc-900 hover:bg-zinc-800 text-white font-bold py-4 px-4 rounded-xl border border-zinc-800 transition text-xs tracking-wider"
+                    className="w-full bg-zinc-900 hover:bg-zinc-850 text-white font-bold py-4 px-4 rounded-xl border border-zinc-800 transition text-xs tracking-wider"
                 >
                     Exit Room
                 </button>
             </div>
         </div>
     );
-}
+}   

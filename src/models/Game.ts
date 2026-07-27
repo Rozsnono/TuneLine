@@ -31,9 +31,10 @@ export interface IGame extends Document {
     phase: 'placement' | 'metadata_guess' | 'revealed';
     mode: 'local' | 'online';
     gameplayMode: 'individual' | 'teams';
-    targetScore: number;         // NEW: Target cards to win (e.g. 5, 8, 10, 12)
-    maxPlayersPerTeam: number;   // NEW: Max players allowed per team (e.g. 2, 3, 4)
-    maxPlayTime: number;         // NEW: Play time limit in seconds (e.g. 10, 15, 20, 30)
+    targetScore: number;
+    maxPlayersPerTeam: number;
+    maxPlayTime: number;
+    isTokenPurchase: boolean;    // NEW: Tracks if the active placement card was bought [1]
     players: IPlayer[];
     teams: ITeam[];
     deck: ICard[];
@@ -81,9 +82,10 @@ const GameSchema = new Schema<IGame>({
     targetScore: { type: Number, default: 10 },
     maxPlayersPerTeam: { type: Number, default: 4 },
     maxPlayTime: { type: Number, default: 30 },
+    isTokenPurchase: { type: Boolean, default: false }, // Default initialized to false
     players: [PlayerSchema],
-    deck: [CardSchema],
     teams: [TeamSchema],
+    deck: [CardSchema],
     currentTurnPlayerId: { type: String, default: '' },
     currentTurnTeamId: { type: String, enum: ['A', 'B', null], default: null },
     currentCard: { type: Schema.Types.Mixed, default: null },

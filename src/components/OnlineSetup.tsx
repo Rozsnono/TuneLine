@@ -100,7 +100,7 @@ export default function OnlineSetup({
                             <button
                                 type="button"
                                 onClick={onGenerateCode}
-                                className="bg-zinc-900 hover:bg-zinc-800 text-neutral-300 px-5 rounded-xl border border-zinc-800 text-xs font-bold active:scale-95 transition"
+                                className="bg-zinc-900 hover:bg-neutral-750 text-neutral-300 px-5 rounded-xl border border-zinc-800 text-xs font-bold active:scale-95 transition"
                             >
                                 Generate
                             </button>

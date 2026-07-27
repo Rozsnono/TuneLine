@@ -50,7 +50,7 @@ export default function LocalSetup({
                 </div>
 
                 <div className="space-y-6 pt-2">
-                    {/* Setting 1: Gameplay Format */}
+                    {/* Format Selection */}
                     <div>
                         <label className="text-[10px] font-bold tracking-wider text-zinc-500 uppercase flex items-center gap-1.5 mb-2">
                             <HelpCircle className="w-3.5 h-3.5" /> 01 / Gameplay Format
@@ -79,10 +79,10 @@ export default function LocalSetup({
                         </div>
                     </div>
 
-                    {/* Setting 2: Min Card to Win [2] */}
+                    {/* Cards to Win Selection [2] */}
                     <div>
                         <label className="text-[10px] font-bold tracking-wider text-zinc-500 uppercase flex items-center gap-1.5 mb-2">
-                            <Trophy className="w-3.5 h-3.5" /> 02 / Min Cards to Win 
+                            <Trophy className="w-3.5 h-3.5" /> 02 / Min Cards to Win
                         </label>
                         <div className="grid grid-cols-4 gap-2 bg-zinc-950/80 p-1.5 rounded-xl border border-zinc-900 shadow-inner">
                             {[5, 8, 10, 12].map((val) => (
@@ -101,11 +101,11 @@ export default function LocalSetup({
                         </div>
                     </div>
 
-                    {/* Setting 3: Player per Team (Only active if Teams is selected) [2] */}
+                    {/* Max Team Members limit (Dynamic) [2] */}
                     {setupGameplay === 'teams' && (
                         <div className="animate-fade-in">
                             <label className="text-[10px] font-bold tracking-wider text-zinc-500 uppercase flex items-center gap-1.5 mb-2">
-                                <Users className="w-3.5 h-3.5" /> 03 / Max Members Per Team
+                                <Users className="w-3.5 h-3.5" /> 03 / Max Members Per Team 
                             </label>
                             <div className="grid grid-cols-3 gap-2 bg-zinc-950/80 p-1.5 rounded-xl border border-zinc-900 shadow-inner">
                                 {[2, 3, 4].map((val) => (
@@ -125,13 +125,13 @@ export default function LocalSetup({
                         </div>
                     )}
 
-                    {/* Setting 4: Song play time max [1] */}
+                    {/* Song playback duration limit [1] */}
                     <div>
                         <label className="text-[10px] font-bold tracking-wider text-zinc-500 uppercase flex items-center gap-1.5 mb-2">
                             <Clock className="w-3.5 h-3.5" /> {setupGameplay === 'teams' ? '04' : '03'} / Max Song Play Time
                         </label>
                         <div className="grid grid-cols-4 gap-2 bg-zinc-950/80 p-1.5 rounded-xl border border-zinc-900 shadow-inner">
-                            {[20, 30, 60].map((val) => (
+                            {[15, 30, 60].map((val) => (
                                 <button
                                     key={val}
                                     type="button"
@@ -145,10 +145,10 @@ export default function LocalSetup({
                                 </button>
                             ))}
                             <button
-                                key={'FULL'}
+                                key={99999}
                                 type="button"
-                                onClick={() => setMaxPlayTime(999999)}
-                                className={`py-2 text-xs font-bold transition duration-300 rounded-lg ${maxPlayTime === 999999
+                                onClick={() => setMaxPlayTime(99999)}
+                                className={`py-2 text-xs font-bold transition duration-300 rounded-lg ${maxPlayTime === 99999
                                     ? 'bg-[#ff5722] text-white shadow-md'
                                     : 'text-zinc-500 hover:text-zinc-300'
                                     }`}

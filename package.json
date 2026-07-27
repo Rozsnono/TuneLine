@@ -10,6 +10,10 @@
     "build:mobile": "mv app/api .api-temp && NEXT_CONFIG_FILE=next.config.mobile.js next build && mv .api-temp app/api"
   },
   "dependencies": {
+    "@capacitor/android": "^8.4.2",
+    "@capacitor/cli": "^8.4.2",
+    "@capacitor/core": "^8.4.2",
+    "framer-motion": "^12.42.2",
     "lucide-react": "^1.27.0",
     "mongoose": "^9.8.0",
     "next": "16.2.12",
