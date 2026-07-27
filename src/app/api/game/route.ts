@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
                 youtubeId: gameObj.currentCard.youtubeId,
                 title: 'Secret Song',
                 artist: 'Secret Artist',
-                year: null
+                year: 0
             };
         }
 
