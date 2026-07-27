@@ -26,8 +26,12 @@ export default function Home() {
   const [message, setMessage] = useState<string>('');
   const [copied, setCopied] = useState<boolean>(false);
 
-  // Configuration Setup States
+  // Configuration Setup States [2]
   const [setupGameplay, setSetupGameplay] = useState<'individual' | 'teams'>('individual');
+  const [targetScore, setTargetScore] = useState<number>(10);
+  const [maxPlayersPerTeam, setMaxPlayersPerTeam] = useState<number>(4);
+  const [maxPlayTime, setMaxPlayTime] = useState<number>(60);
+
   const [localInputName, setLocalInputName] = useState<string>('');
   const [localInputTeam, setLocalInputTeam] = useState<'A' | 'B'>('A');
 
@@ -47,6 +51,25 @@ export default function Home() {
   const isHost = game ? ((game.players || []).length > 0 && game.players[0]?.id === playerId) : false;
   const activeModeType = roomId.startsWith('LOC_') ? 'local' : (game ? game.mode : 'online');
   const canPlayActiveTurn = game ? (isMyTurn || activeModeType === 'local') : false;
+
+  // --- NEW: High-performance auto play-limit stopwatch hook [1] ---
+  useEffect(() => {
+    let stopwatch: any;
+    if (isPlaying && game?.maxPlayTime) {
+      const maxMs = game.maxPlayTime * 1000;
+      stopwatch = setTimeout(() => {
+        try {
+          stopAudio();
+          setMessage(`Time limit hit. Track paused at ${game.maxPlayTime}s.`);
+        } catch (e) {
+          console.error('Stopwatch failed to halt audio', e);
+        }
+      }, maxMs);
+    }
+    return () => {
+      if (stopwatch) clearTimeout(stopwatch);
+    };
+  }, [isPlaying, game?.currentCard?.youtubeId, game?.maxPlayTime]);
 
   // --- Hoisted State Handlers (TDZ Protected) ---
   function attemptSessionRestoration(targetRoom: string, pId: string, name: string) {
@@ -110,6 +133,9 @@ export default function Home() {
         playerName: activeName,
         mode: activeMode,
         gameplayMode: setupGameplay,
+        targetScore,          // Passes customizable goal settings [2]
+        maxPlayersPerTeam,    // Passes team members capacity [2]
+        maxPlayTime           // Passes song playback caps [1]
       }),
     })
       .then((res) => {
@@ -158,12 +184,15 @@ export default function Home() {
             setGame(data.game);
             setMessage('');
           });
+        } else {
+          res.json().then((errData) => {
+            setMessage(errData.error || 'Roster error.');
+          });
         }
       })
       .catch(() => setMessage('Failed to add local player'));
   }
 
-  // Remove player
   function handleRemoveLocalPlayer(targetLocalId: string) {
     fetch(`${API_BASE_URL}/api/game`, {
       method: 'POST',
@@ -199,6 +228,10 @@ export default function Home() {
         if (res.ok) {
           res.json().then((data) => {
             setGame(data.game);
+          });
+        } else {
+          res.json().then((errData) => {
+            setMessage(errData.error);
           });
         }
       })
@@ -292,7 +325,6 @@ export default function Home() {
       .catch(() => setMessage('Reveal failed.'));
   }
 
-  // Upgraded parameters to pass opponent token recipient IDs [1]
   function resolveTurnWithMetadata(metadataChoice: 'none' | 'artist' | 'title' | 'both', recipientId?: string) {
     fetch(`${API_BASE_URL}/api/game`, {
       method: 'POST',
@@ -405,7 +437,6 @@ export default function Home() {
       .catch(() => setMessage('Steal request transmission error.'));
   }
 
-  // Explicit Card purchasing utilizing 3 active tokens [1, 2]
   function handleBuyCard() {
     fetch(`${API_BASE_URL}/api/game`, {
       method: 'POST',
@@ -445,7 +476,7 @@ export default function Home() {
     }
   }
 
-  // Hydration mount checks
+  // Hydration Mount Recovery Hook
   useEffect(() => {
     let id = localStorage.getItem('hitster_player_id');
     if (!id) {
@@ -566,98 +597,107 @@ export default function Home() {
   }, [game?.phase]);
 
   return (
-    <>
-      {/* Permanent, static hidden YouTube target container on the DOM */}
-      <div id="youtube-audio-player" className="hidden pointer-events-none w-0 h-0 absolute"></div>
+    <div className="min-h-screen bg-[#010103] flex justify-center items-center">
+      <div className="w-full max-w-md min-h-screen bg-[#050508] shadow-[0_0_80px_rgba(0,0,0,0.85)] md:border-x md:border-zinc-900/60 relative flex flex-col overflow-hidden justify-between">
 
-      {playModeSelection === null && <ModeSelection onSelect={setPlayModeSelection} />}
+        {/* Permanent, static hidden YouTube target container on the DOM */}
+        <div id="youtube-audio-player" className="hidden pointer-events-none w-0 h-0 absolute"></div>
 
-      {playModeSelection === 'local' && !hasJoined && (
-        <LocalSetup
-          setupGameplay={setupGameplay}
-          setSetupGameplay={setSetupGameplay}
-          onBack={() => setPlayModeSelection(null)}
-          onSubmit={handleCreateLocalSession}
-          message={message}
-        />
-      )}
+        {playModeSelection === null && <ModeSelection onSelect={setPlayModeSelection} />}
 
-      {playModeSelection === 'online' && !hasJoined && (
-        <OnlineSetup
-          setupGameplay={setupGameplay}
-          setSetupGameplay={setSetupGameplay}
-          playerName={playerName}
-          setPlayerName={setPlayerName}
-          roomInput={roomInput}
-          setRoomInput={setRoomInput}
-          onGenerateCode={generateRoomCode}
-          onBack={() => setPlayModeSelection(null)}
-          onSubmit={handleJoinOrCreate}
-          message={message}
-        />
-      )}
+        {playModeSelection === 'local' && !hasJoined && (
+          <LocalSetup
+            setupGameplay={setupGameplay}
+            setSetupGameplay={setSetupGameplay}
+            targetScore={targetScore}
+            setTargetScore={setTargetScore}
+            maxPlayersPerTeam={maxPlayersPerTeam}
+            setMaxPlayersPerTeam={setMaxPlayersPerTeam}
+            maxPlayTime={maxPlayTime}
+            setMaxPlayTime={setMaxPlayTime}
+            onBack={() => setPlayModeSelection(null)}
+            onSubmit={handleCreateLocalSession}
+            message={message}
+          />
+        )}
 
-      {hasJoined && game && game.status === 'waiting' && (
-        <WaitingLobby
-          game={game}
-          playerId={playerId}
-          isHost={isHost}
-          activeModeType={activeModeType}
-          localInputName={localInputName}
-          setLocalInputName={setLocalInputName}
-          localInputTeam={localInputTeam}
-          setLocalInputTeam={setLocalInputTeam}
-          myPlayer={myPlayer as any}
-          copied={copied}
-          message={message}
-          onLeave={handleLeaveGame}
-          onCopyRoomCode={copyRoomCode}
-          onAddLocalPlayer={handleAddLocalPlayer}
-          onRemoveLocalPlayer={handleRemoveLocalPlayer}
-          onSelectTeam={handleSelectTeam}
-          onStartGame={handleStartGame}
-        />
-      )}
+        {playModeSelection === 'online' && !hasJoined && (
+          <OnlineSetup
+            setupGameplay={setupGameplay}
+            setSetupGameplay={setSetupGameplay}
+            playerName={playerName}
+            setPlayerName={setPlayerName}
+            roomInput={roomInput}
+            setRoomInput={setRoomInput}
+            onGenerateCode={generateRoomCode}
+            onBack={() => setPlayModeSelection(null)}
+            onSubmit={handleJoinOrCreate}
+            message={message}
+          />
+        )}
 
-      {hasJoined && game && game.status === 'finished' && (
-        <Finished
-          game={game}
-          isHost={isHost}
-          activeModeType={activeModeType}
-          onRestart={handleStartGame}
-          onLeave={handleLeaveGame}
-        />
-      )}
+        {hasJoined && game && game.status === 'waiting' && (
+          <WaitingLobby
+            game={game}
+            playerId={playerId}
+            isHost={isHost}
+            activeModeType={activeModeType}
+            localInputName={localInputName}
+            setLocalInputName={setLocalInputName}
+            localInputTeam={localInputTeam}
+            setLocalInputTeam={setLocalInputTeam}
+            myPlayer={myPlayer as any}
+            copied={copied}
+            message={message}
+            onLeave={handleLeaveGame}
+            onCopyRoomCode={copyRoomCode}
+            onAddLocalPlayer={handleAddLocalPlayer}
+            onRemoveLocalPlayer={handleRemoveLocalPlayer}
+            onSelectTeam={handleSelectTeam}
+            onStartGame={handleStartGame}
+          />
+        )}
 
-      {hasJoined && game && game.status === 'playing' && (
-        <GamePlay
-          game={game}
-          playerId={playerId}
-          activeModeType={activeModeType}
-          isMyTurn={isMyTurn}
-          activePlayer={activePlayer as any}
-          myPlayer={myPlayer as any}
-          canPlayActiveTurn={canPlayActiveTurn}
-          isPlaying={isPlaying}
-          playerRef={playerRef}
-          onToggleAudio={toggleAudio}
-          onStopAudio={stopAudio}
-          onReportBroken={reportBrokenSong}
-          onSubmitPlacement={submitPlacement}
-          onRevealMetadata={revealMetadata}
-          onResolveTurnWithMetadata={resolveTurnWithMetadata}
-          onSubmitSteal={submitSteal}
-          onBuyCard={handleBuyCard} // Bound purchase hook [1]
-          selectedSlot={selectedSlot}
-          setSelectedSlot={setSelectedSlot}
-          isStealing={isStealing}
-          setIsStealing={setIsStealing}
-          localStealerId={localStealerId}
-          setLocalStealerId={setLocalStealerId}
-          message={message}
-          onLeaveGame={handleLeaveGame}
-        />
-      )}
-    </>
+        {hasJoined && game && game.status === 'finished' && (
+          <Finished
+            game={game}
+            isHost={isHost}
+            activeModeType={activeModeType}
+            onRestart={handleStartGame}
+            onLeave={handleLeaveGame}
+          />
+        )}
+
+        {hasJoined && game && game.status === 'playing' && (
+          <GamePlay
+            game={game}
+            playerId={playerId}
+            activeModeType={activeModeType}
+            isMyTurn={isMyTurn}
+            activePlayer={activePlayer as any}
+            myPlayer={myPlayer as any}
+            canPlayActiveTurn={canPlayActiveTurn}
+            isPlaying={isPlaying}
+            playerRef={playerRef}
+            onToggleAudio={toggleAudio}
+            onStopAudio={stopAudio}
+            onReportBroken={reportBrokenSong}
+            onSubmitPlacement={submitPlacement}
+            onRevealMetadata={revealMetadata}
+            onResolveTurnWithMetadata={resolveTurnWithMetadata}
+            onSubmitSteal={submitSteal}
+            onBuyCard={handleBuyCard}
+            selectedSlot={selectedSlot}
+            setSelectedSlot={setSelectedSlot}
+            isStealing={isStealing}
+            setIsStealing={setIsStealing}
+            localStealerId={localStealerId}
+            setLocalStealerId={setLocalStealerId}
+            message={message}
+            onLeaveGame={handleLeaveGame}
+          />
+        )}
+      </div>
+    </div>
   );
 }

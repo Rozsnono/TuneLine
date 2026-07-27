@@ -496,7 +496,7 @@ export const MUSIC_LIBRARY: ICard[] = [
         "title": "Rövid az élet",
         "artist": "Toldy Mária",
         "year": 1966,
-        "youtubeId": "Uylcg1TgH_A"
+        "youtubeId": "M0-7EgjUOcQ"
     },
     {
         "id": "1960_37",
@@ -902,7 +902,7 @@ export const MUSIC_LIBRARY: ICard[] = [
         "title": "I'm still standing",
         "artist": "Elton John",
         "year": 1970,
-        "youtubeId": "ZHwVBirqD2s"
+        "youtubeId": "MJ_aPtt4U8M"
     },
     {
         "id": "1980_1",
@@ -1252,7 +1252,7 @@ export const MUSIC_LIBRARY: ICard[] = [
         "title": "Szállj velem",
         "artist": "Vincze Lilla",
         "year": 1987,
-        "youtubeId": "L2rB7v3_KxR"
+        "youtubeId": "TTXk9r3K8cU"
     },
     {
         "id": "1980_51",
@@ -1315,7 +1315,7 @@ export const MUSIC_LIBRARY: ICard[] = [
         "title": "I Want To Know What Love Is",
         "artist": "Foreigner",
         "year": 1984,
-        "youtubeId": "r3pr1_ClsCM"
+        "youtubeId": "2j_ai_zYntw"
     },
     {
         "id": "1980_60",
@@ -2064,7 +2064,7 @@ export const MUSIC_LIBRARY: ICard[] = [
         "title": "Homokba rajzolt szerelem",
         "artist": "V-Tech",
         "year": 2003,
-        "youtubeId": "Uylcg1TgH_D"
+        "youtubeId": "n3x8G0qsMsE"
     },
     {
         "id": "2000_31",
@@ -2505,7 +2505,7 @@ export const MUSIC_LIBRARY: ICard[] = [
         "title": "Bájoló",
         "artist": "Szabó Balázs Bandája",
         "year": 2014,
-        "youtubeId": "Kz1L3uS9m8Q"
+        "youtubeId": "PcPmokVbz3A"
     },
     {
         "id": "2010_41",
@@ -2547,7 +2547,7 @@ export const MUSIC_LIBRARY: ICard[] = [
         "title": "Running",
         "artist": "Kállay Saunders András",
         "year": 2014,
-        "youtubeId": "qQ5a18xJk4W"
+        "youtubeId": "QzfRDZmuFUI"
     },
     {
         "id": "2010_47",
@@ -2631,7 +2631,7 @@ export const MUSIC_LIBRARY: ICard[] = [
         "title": "Megmondtam",
         "artist": "T. Danny",
         "year": 2020,
-        "youtubeId": "x4c8Vj3D1bP"
+        "youtubeId": "JU7btMYmm24"
     },
     {
         "id": "2020_9",
@@ -2701,7 +2701,7 @@ export const MUSIC_LIBRARY: ICard[] = [
         "title": "Bagira",
         "artist": "Beton.Hofi",
         "year": 2022,
-        "youtubeId": "W5_z4g5m6yM"
+        "youtubeId": "JCow8cP4h78"
     },
     {
         "id": "2020_19",
@@ -2841,7 +2841,7 @@ export const MUSIC_LIBRARY: ICard[] = [
         "title": "Greedy",
         "artist": "Tate McRae",
         "year": 2023,
-        "youtubeId": "vQ2XG5X3D7E"
+        "youtubeId": "To4SWGZkEPk"
     },
     {
         "id": "2020_40",
@@ -2876,7 +2876,7 @@ export const MUSIC_LIBRARY: ICard[] = [
         "title": "Meddig maradunk még",
         "artist": "Margaret Island",
         "year": 2021,
-        "youtubeId": "W5_z4g5m6yK"
+        "youtubeId": "eA35binsGI8"
     },
     {
         "id": "2020_45",
@@ -2897,14 +2897,14 @@ export const MUSIC_LIBRARY: ICard[] = [
         "title": "Chemical",
         "artist": "Post Malone",
         "year": 2023,
-        "youtubeId": "N9i81hM8E6s"
+        "youtubeId": "81pk9vrKprA"
     },
     {
         "id": "2020_48",
         "title": "Dobd el ami fáj",
         "artist": "Pápai Joci",
         "year": 2020,
-        "youtubeId": "x4c8Vj3D1bW"
+        "youtubeId": "6YYCRQNdAFs"
     },
     {
         "id": "2020_49",

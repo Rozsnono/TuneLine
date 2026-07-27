@@ -1,10 +1,16 @@
 'use client';
 
-import { ChevronLeft, Sparkles } from 'lucide-react';
+import { ChevronLeft, Sparkles, Trophy, Users, Clock, HelpCircle } from 'lucide-react';
 
 interface LocalSetupProps {
     setupGameplay: 'individual' | 'teams';
     setSetupGameplay: (val: 'individual' | 'teams') => void;
+    targetScore: number;
+    setTargetScore: (val: number) => void;
+    maxPlayersPerTeam: number;
+    setMaxPlayersPerTeam: (val: number) => void;
+    maxPlayTime: number;
+    setMaxPlayTime: (val: number) => void;
     onBack: () => void;
     onSubmit: () => void;
     message: string;
@@ -13,40 +19,49 @@ interface LocalSetupProps {
 export default function LocalSetup({
     setupGameplay,
     setSetupGameplay,
+    targetScore,
+    setTargetScore,
+    maxPlayersPerTeam,
+    setMaxPlayersPerTeam,
+    maxPlayTime,
+    setMaxPlayTime,
     onBack,
     onSubmit,
     message
 }: LocalSetupProps) {
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-[#050508] text-white px-4 relative overflow-hidden font-mono">
-            <div className="absolute top-[5%] left-[5%] w-[50%] h-[50%] bg-[#ff5722]/5 rounded-full blur-[110px] pointer-events-none"></div>
+        <div className="flex flex-col min-h-screen bg-[#050508] text-white px-6 pt-14 pb-12 justify-between relative overflow-hidden font-mono select-none">
+            <div className="absolute top-[5%] left-[5%] w-[60%] h-[50%] bg-[#ff5722]/5 rounded-full blur-[120px] pointer-events-none"></div>
 
-            <div className="w-full max-w-sm p-6 bg-zinc-900/60 backdrop-blur-md rounded-3xl shadow-2xl border border-zinc-850 space-y-6 z-10">
-                <div className="flex items-center gap-3">
+            <div className="space-y-6 overflow-y-auto max-h-[85vh] pr-1">
+                <div className="flex items-center gap-4">
                     <button
                         onClick={onBack}
-                        className="p-2.5 bg-zinc-950/60 hover:bg-zinc-800 rounded-xl border border-zinc-800 text-zinc-400 hover:text-white transition active:scale-90"
+                        className="p-2.5 bg-zinc-950/60 hover:bg-zinc-800 rounded-xl border border-zinc-800 text-neutral-400 hover:text-white transition active:scale-90"
                     >
                         <ChevronLeft className="w-4 h-4" />
                     </button>
                     <div>
-                        <h2 className="text-base font-black text-white uppercase tracking-tight">LOCAL GAMEPLAY</h2>
-                        <p className="text-[10px] text-[#ff5722] font-bold tracking-widest uppercase flex items-center gap-1 mt-0.5">
-                            <Sparkles className="w-3 h-3 animate-pulse" /> PASS_AND_PLAY_CONFIG
+                        <h2 className="text-base font-black text-white uppercase tracking-tight">LOCAL SETUP</h2>
+                        <p className="text-[10px] text-[#ff5722] font-bold tracking-widest uppercase flex items-center gap-1 mt-0.5 animate-pulse">
+                            <Sparkles className="w-3 h-3" /> PASS_AND_PLAY_CONFIG
                         </p>
                     </div>
                 </div>
 
-                <div className="space-y-5">
+                <div className="space-y-6 pt-2">
+                    {/* Setting 1: Gameplay Format */}
                     <div>
-                        <label className="block text-xs text-zinc-500 uppercase tracking-widest mb-2">Gameplay Format</label>
-                        <div className="grid grid-cols-2 gap-2 bg-zinc-950/80 p-1.5 rounded-xl border border-zinc-850 shadow-inner">
+                        <label className="text-[10px] font-bold tracking-wider text-zinc-500 uppercase flex items-center gap-1.5 mb-2">
+                            <HelpCircle className="w-3.5 h-3.5" /> 01 / Gameplay Format
+                        </label>
+                        <div className="grid grid-cols-2 gap-2 bg-zinc-950/80 p-1.5 rounded-xl border border-zinc-900 shadow-inner">
                             <button
                                 type="button"
                                 onClick={() => setSetupGameplay('individual')}
                                 className={`py-2 text-xs font-bold transition duration-300 rounded-lg ${setupGameplay === 'individual'
-                                        ? 'bg-[#ff5722] text-white shadow-md'
-                                        : 'text-zinc-500 hover:text-zinc-300'
+                                    ? 'bg-[#ff5722] text-white shadow-md'
+                                    : 'text-zinc-500 hover:text-zinc-300'
                                     }`}
                             >
                                 Individual
@@ -55,8 +70,8 @@ export default function LocalSetup({
                                 type="button"
                                 onClick={() => setSetupGameplay('teams')}
                                 className={`py-2 text-xs font-bold transition duration-300 rounded-lg ${setupGameplay === 'teams'
-                                        ? 'bg-[#ff5722] text-white shadow-md'
-                                        : 'text-zinc-500 hover:text-zinc-300'
+                                    ? 'bg-[#ff5722] text-white shadow-md'
+                                    : 'text-zinc-500 hover:text-zinc-300'
                                     }`}
                             >
                                 Team vs Team
@@ -64,13 +79,94 @@ export default function LocalSetup({
                         </div>
                     </div>
 
-                    <button
-                        onClick={onSubmit}
-                        className="w-full bg-[#f4f4f5] hover:bg-white text-zinc-950 font-extrabold py-3.5 px-4 rounded-xl transition active:scale-95 text-xs tracking-wider"
-                    >
-                        CONFIGURE_PLAYER_ROSTER
-                    </button>
+                    {/* Setting 2: Min Card to Win [2] */}
+                    <div>
+                        <label className="text-[10px] font-bold tracking-wider text-zinc-500 uppercase flex items-center gap-1.5 mb-2">
+                            <Trophy className="w-3.5 h-3.5" /> 02 / Min Cards to Win 
+                        </label>
+                        <div className="grid grid-cols-4 gap-2 bg-zinc-950/80 p-1.5 rounded-xl border border-zinc-900 shadow-inner">
+                            {[5, 8, 10, 12].map((val) => (
+                                <button
+                                    key={val}
+                                    type="button"
+                                    onClick={() => setTargetScore(val)}
+                                    className={`py-2 text-xs font-bold transition duration-300 rounded-lg ${targetScore === val
+                                        ? 'bg-[#ff5722] text-white shadow-md'
+                                        : 'text-zinc-500 hover:text-zinc-300'
+                                        }`}
+                                >
+                                    {val}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Setting 3: Player per Team (Only active if Teams is selected) [2] */}
+                    {setupGameplay === 'teams' && (
+                        <div className="animate-fade-in">
+                            <label className="text-[10px] font-bold tracking-wider text-zinc-500 uppercase flex items-center gap-1.5 mb-2">
+                                <Users className="w-3.5 h-3.5" /> 03 / Max Members Per Team
+                            </label>
+                            <div className="grid grid-cols-3 gap-2 bg-zinc-950/80 p-1.5 rounded-xl border border-zinc-900 shadow-inner">
+                                {[2, 3, 4].map((val) => (
+                                    <button
+                                        key={val}
+                                        type="button"
+                                        onClick={() => setMaxPlayersPerTeam(val)}
+                                        className={`py-2 text-xs font-bold transition duration-300 rounded-lg ${maxPlayersPerTeam === val
+                                            ? 'bg-[#ff5722] text-white shadow-md'
+                                            : 'text-zinc-500 hover:text-zinc-300'
+                                            }`}
+                                    >
+                                        {val}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Setting 4: Song play time max [1] */}
+                    <div>
+                        <label className="text-[10px] font-bold tracking-wider text-zinc-500 uppercase flex items-center gap-1.5 mb-2">
+                            <Clock className="w-3.5 h-3.5" /> {setupGameplay === 'teams' ? '04' : '03'} / Max Song Play Time
+                        </label>
+                        <div className="grid grid-cols-4 gap-2 bg-zinc-950/80 p-1.5 rounded-xl border border-zinc-900 shadow-inner">
+                            {[20, 30, 60].map((val) => (
+                                <button
+                                    key={val}
+                                    type="button"
+                                    onClick={() => setMaxPlayTime(val)}
+                                    className={`py-2 text-xs font-bold transition duration-300 rounded-lg ${maxPlayTime === val
+                                        ? 'bg-[#ff5722] text-white shadow-md'
+                                        : 'text-zinc-500 hover:text-zinc-300'
+                                        }`}
+                                >
+                                    {val}s
+                                </button>
+                            ))}
+                            <button
+                                key={'FULL'}
+                                type="button"
+                                onClick={() => setMaxPlayTime(999999)}
+                                className={`py-2 text-xs font-bold transition duration-300 rounded-lg ${maxPlayTime === 999999
+                                    ? 'bg-[#ff5722] text-white shadow-md'
+                                    : 'text-zinc-500 hover:text-zinc-300'
+                                    }`}
+                            >
+                                FULL
+                            </button>
+                        </div>
+                    </div>
                 </div>
+            </div>
+
+            <div className="space-y-4 pt-6">
+                <button
+                    onClick={onSubmit}
+                    className="w-full bg-[#f4f4f5] hover:bg-white text-zinc-950 font-extrabold py-4 px-4 rounded-xl transition active:scale-95 text-xs tracking-wider"
+                >
+                    CONFIGURE_PLAYER_ROSTER
+                </button>
 
                 {message && (
                     <div className="p-3 rounded-xl bg-red-950/40 border border-red-900/50 text-red-400 text-xs text-center animate-pulse">

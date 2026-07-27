@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
             game.mode = 'local';
         }
 
-        // Defensive State Healing
+        // DEFENSIVE STATE HEALING (Prevents undefined property crashes)
         if (!game.players) game.players = [];
         if (!game.teams || game.teams.length === 0) {
             game.teams = [
@@ -36,8 +36,8 @@ export async function GET(request: NextRequest) {
                 { id: 'B', name: 'Red Team', timeline: [], score: 0, tokens: 0 }
             ];
         }
-        if (!(game as any).deck || (game as any).deck.length === 0) {
-            (game as any).deck = shuffleDeck(MUSIC_LIBRARY);
+        if (!game.deck || game.deck.length === 0) {
+            game.deck = shuffleDeck(MUSIC_LIBRARY);
         }
 
         const gameObj = game.toObject();
@@ -72,10 +72,13 @@ export async function POST(request: NextRequest) {
             gameplayMode,
             teamId,
             selectedIndex,
-            metadataGuessed, // 'none' | 'artist' | 'title' | 'both'
-            metadataRecipientId, // Other player/team receiving stolen tokens
+            metadataGuessed,
+            metadataRecipientId,
             removePlayerId,
-            stealerId
+            stealerId,
+            targetScore,
+            maxPlayersPerTeam,
+            maxPlayTime
         } = body;
 
         if (!roomId) {
@@ -96,7 +99,10 @@ export async function POST(request: NextRequest) {
                 deck: shuffleDeck(MUSIC_LIBRARY),
                 status: 'waiting',
                 mode: activeMode,
-                gameplayMode: gameplayMode || 'individual'
+                gameplayMode: gameplayMode || 'individual',
+                targetScore: targetScore || 10,
+                maxPlayersPerTeam: maxPlayersPerTeam || 4,
+                maxPlayTime: maxPlayTime || 15
             });
         }
 
@@ -117,8 +123,8 @@ export async function POST(request: NextRequest) {
                 { id: 'B', name: 'Red Team', timeline: [], score: 0, tokens: 0 }
             ];
         }
-        if (!(game as any).deck || (game as any).deck.length === 0) {
-            (game as any).deck = shuffleDeck(MUSIC_LIBRARY);
+        if (!game.deck || game.deck.length === 0) {
+            game.deck = shuffleDeck(MUSIC_LIBRARY);
         }
 
         // ACTION: Join room
@@ -137,6 +143,9 @@ export async function POST(request: NextRequest) {
                 }];
                 game.mode = activeMode;
                 if (gameplayMode) game.gameplayMode = gameplayMode;
+                if (targetScore) game.targetScore = targetScore;
+                if (maxPlayersPerTeam) game.maxPlayersPerTeam = maxPlayersPerTeam;
+                if (maxPlayTime) game.maxPlayTime = maxPlayTime;
             } else {
                 const existingPlayer = game.players.find((p: any) => p.id === playerId);
                 if (!existingPlayer) {
@@ -150,11 +159,22 @@ export async function POST(request: NextRequest) {
                     });
                 }
             }
+
+            game.markModified('players');
             await game.save();
         }
 
         // ACTION: Add Player (Local)
         else if (action === 'add_local_player') {
+            if (game.gameplayMode === 'teams' && teamId) {
+                const teamCount = game.players.filter((p: any) => p.teamId === teamId).length;
+                if (teamCount >= (game.maxPlayersPerTeam || 4)) {
+                    return NextResponse.json({
+                        error: `Team roster full. Max limit: ${game.maxPlayersPerTeam || 4} members.`
+                    }, { status: 400 });
+                }
+            }
+
             const localId = 'usr_local_' + Math.random().toString(36).substring(2, 9);
             game.players.push({
                 id: localId,
@@ -164,20 +184,33 @@ export async function POST(request: NextRequest) {
                 score: 0,
                 tokens: 0
             });
+
+            game.markModified('players');
             await game.save();
         }
 
         // ACTION: Remove Local Player
         else if (action === 'remove_local_player') {
             game.players = game.players.filter((p: any) => p.id !== removePlayerId);
+            game.markModified('players');
             await game.save();
         }
 
         // ACTION: Assign/Select Team
         else if (action === 'select_team') {
+            if (game.gameplayMode === 'teams' && teamId) {
+                const teamCount = game.players.filter((p: any) => p.teamId === teamId).length;
+                if (teamCount >= (game.maxPlayersPerTeam || 4)) {
+                    return NextResponse.json({
+                        error: `That team is currently full. Max limit: ${game.maxPlayersPerTeam} members.`
+                    }, { status: 400 });
+                }
+            }
+
             const player = game.players.find((p: any) => p.id === playerId);
             if (player) {
                 player.teamId = teamId;
+                game.markModified('players');
                 await game.save();
             }
         }
@@ -229,12 +262,18 @@ export async function POST(request: NextRequest) {
                 game.currentTurnPlayerId = game.players[0].id;
             }
 
-            (game as any).deck = deck;
+            game.deck = deck;
             game.currentCard = deck.pop() || null;
             game.status = 'playing';
             game.phase = 'placement';
             game.lastGuessCorrect = null;
             game.lastGuessIndex = null;
+
+            // Force write nested parameters to avoid MongoDB race locks [1]
+            game.markModified('currentCard');
+            game.markModified('deck');
+            game.markModified('players');
+            game.markModified('teams');
             await game.save();
         }
 
@@ -277,6 +316,8 @@ export async function POST(request: NextRequest) {
             game.lastGuessCorrect = isCorrect;
             game.lastGuessIndex = selectedIndex;
             game.phase = 'metadata_guess';
+
+            game.markModified('players');
             await game.save();
         }
 
@@ -320,24 +361,24 @@ export async function POST(request: NextRequest) {
 
             if (!boardOwner.timeline) boardOwner.timeline = [];
 
-            // 1. Process Timeline Card insertion (Only if guessed correctly)
+            // 1. Process Timeline Card insertion
             if (game.lastGuessCorrect && game.lastGuessIndex !== null) {
                 boardOwner.timeline.splice(game.lastGuessIndex, 0, activeCard);
                 boardOwner.score = boardOwner.timeline.length;
             }
 
-            // 2. Process Granular Token metadata rewards for active player
-            let activeAwardedTokens = 0;
+            // 2. Process Granular Token metadata rewards
+            let awardedTokens = 0;
             if (metadataGuessed === 'artist' || metadataGuessed === 'title') {
-                activeAwardedTokens = 1;
+                awardedTokens = 1;
             } else if (metadataGuessed === 'both') {
-                activeAwardedTokens = 2;
+                awardedTokens = 2;
             }
 
-            boardOwner.tokens = (boardOwner.tokens || 0) + activeAwardedTokens;
+            boardOwner.tokens = (boardOwner.tokens || 0) + awardedTokens;
 
-            // 3. Process Stolen remaining tokens to chosen opponent
-            const remainingTokens = 2 - activeAwardedTokens;
+            // 3. Process Stolen remaining tokens
+            const remainingTokens = 2 - awardedTokens;
             if (remainingTokens > 0 && metadataRecipientId) {
                 let recipient: any;
                 if (game.gameplayMode === 'teams') {
@@ -349,10 +390,8 @@ export async function POST(request: NextRequest) {
                 if (recipient) {
                     recipient.tokens = (recipient.tokens || 0) + remainingTokens;
 
-                    // Opponent token trade-in check
                     if (recipient.tokens >= 3) {
                         recipient.tokens -= 3;
-                        // Place automatically in correct spot
                         recipient.timeline.push(activeCard);
                         recipient.timeline.sort((a: any, b: any) => a.year - b.year);
                         recipient.score = recipient.timeline.length;
@@ -360,7 +399,6 @@ export async function POST(request: NextRequest) {
                 }
             }
 
-            // Active player token trade-in check
             if (boardOwner.tokens >= 3) {
                 boardOwner.tokens -= 3;
                 if (!game.lastGuessCorrect) {
@@ -370,8 +408,9 @@ export async function POST(request: NextRequest) {
                 }
             }
 
-            // 4. Evaluate Win Parameters
-            if (boardOwner.score >= 5) {
+            // 4. Evaluate Win Parameters: DYNAMIC EVALUATION [2]
+            const winGoal = game.targetScore || 10;
+            if (boardOwner.score >= winGoal) {
                 game.status = 'finished';
                 game.winnerId = game.gameplayMode === 'teams' ? game.currentTurnTeamId : game.currentTurnPlayerId;
             } else {
@@ -399,6 +438,11 @@ export async function POST(request: NextRequest) {
                 }
             }
 
+            // Force write modified tags before saving [1]
+            game.markModified('currentCard');
+            game.markModified('deck');
+            game.markModified('players');
+            game.markModified('teams');
             await game.save();
         }
 
@@ -445,7 +489,9 @@ export async function POST(request: NextRequest) {
                 stealerBoard.timeline.splice(selectedIndex, 0, activeCard);
                 stealerBoard.score = stealerBoard.timeline.length;
 
-                if (stealerBoard.score >= 5) {
+                // DYNAMIC EVALUATION [2]
+                const winGoal = game.targetScore || 10;
+                if (stealerBoard.score >= winGoal) {
                     game.status = 'finished';
                     game.winnerId = stealerId;
                 } else {
@@ -472,22 +518,33 @@ export async function POST(request: NextRequest) {
                     }
                 }
 
+                // Force write modified tags before saving [1]
+                game.markModified('currentCard');
+                game.markModified('deck');
+                game.markModified('players');
+                game.markModified('teams');
                 await game.save();
                 return NextResponse.json({ game });
             } else {
                 stealerBoard.tokens = Math.max(0, (stealerBoard.tokens || 0) - 1);
+
+                // Force write modified tags before saving [1]
+                game.markModified('players');
+                game.markModified('teams');
                 await game.save();
                 return NextResponse.json({ error: 'Incorrect timeline slot! Steal failed. Penalty: -1 Token.' }, { status: 400 });
             }
         }
 
-        // ACTION: Report Broken / Skip Song
+        // ACTION: Report Broken / Skip Song (With instant-tracking save guarantees) [1]
         else if (action === 'report_broken') {
             if (game.status !== 'playing') {
                 return NextResponse.json({ error: 'Game is not active.' }, { status: 400 });
             }
-            if (game.mode === 'online' && game.currentTurnPlayerId !== playerId) {
-                return NextResponse.json({ error: 'Not your turn.' }, { status: 400 });
+
+            const isHost = game.players.length > 0 && game.players[0].id === playerId;
+            if (game.mode === 'online' && game.currentTurnPlayerId !== playerId && !isHost) {
+                return NextResponse.json({ error: 'Only the active player or host can skip songs.' }, { status: 400 });
             }
 
             const activeCard = game.currentCard;
@@ -509,6 +566,9 @@ export async function POST(request: NextRequest) {
             game.lastGuessCorrect = null;
             game.lastGuessIndex = null;
 
+            // Force write modified tags before saving [1]
+            game.markModified('currentCard');
+            game.markModified('deck');
             await game.save();
         }
 
@@ -533,10 +593,8 @@ export async function POST(request: NextRequest) {
                 return NextResponse.json({ error: 'Not enough tokens. Cost: 3 Tokens.' }, { status: 400 });
             }
 
-            // Deduct 3 tokens [1]
             boardOwner.tokens -= 3;
 
-            // Draw and auto-sort the purchased card chronologically [1, 2]
             const purchasedCard = game.deck.pop();
             if (purchasedCard) {
                 if (!boardOwner.timeline) boardOwner.timeline = [];
@@ -545,12 +603,18 @@ export async function POST(request: NextRequest) {
                 boardOwner.score = boardOwner.timeline.length;
             }
 
-            // Check win boundaries
-            if (boardOwner.score >= 5) {
+            // DYNAMIC EVALUATION [2]
+            const winGoal = game.targetScore || 10;
+            if (boardOwner.score >= winGoal) {
                 game.status = 'finished';
                 game.winnerId = game.gameplayMode === 'teams' ? boardOwner.id : boardOwner.id;
             }
 
+            // Force write modified tags before saving [1]
+            game.markModified('currentCard');
+            game.markModified('deck');
+            game.markModified('players');
+            game.markModified('teams');
             await game.save();
         }
 

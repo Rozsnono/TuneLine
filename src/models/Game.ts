@@ -31,9 +31,12 @@ export interface IGame extends Document {
     phase: 'placement' | 'metadata_guess' | 'revealed';
     mode: 'local' | 'online';
     gameplayMode: 'individual' | 'teams';
-    deck: ICard[];
+    targetScore: number;         // NEW: Target cards to win (e.g. 5, 8, 10, 12)
+    maxPlayersPerTeam: number;   // NEW: Max players allowed per team (e.g. 2, 3, 4)
+    maxPlayTime: number;         // NEW: Play time limit in seconds (e.g. 10, 15, 20, 30)
     players: IPlayer[];
     teams: ITeam[];
+    deck: ICard[];
     currentTurnPlayerId: string;
     currentTurnTeamId: 'A' | 'B' | null;
     currentCard: ICard | null;
@@ -75,8 +78,11 @@ const GameSchema = new Schema<IGame>({
     phase: { type: String, enum: ['placement', 'metadata_guess', 'revealed'], default: 'placement' },
     mode: { type: String, enum: ['local', 'online'], default: 'online' },
     gameplayMode: { type: String, enum: ['individual', 'teams'], default: 'individual' },
-    deck: [CardSchema],
+    targetScore: { type: Number, default: 10 },
+    maxPlayersPerTeam: { type: Number, default: 4 },
+    maxPlayTime: { type: Number, default: 30 },
     players: [PlayerSchema],
+    deck: [CardSchema],
     teams: [TeamSchema],
     currentTurnPlayerId: { type: String, default: '' },
     currentTurnTeamId: { type: String, enum: ['A', 'B', null], default: null },
@@ -86,7 +92,6 @@ const GameSchema = new Schema<IGame>({
     winnerId: { type: String, default: null },
 }, { timestamps: true });
 
-// Cache-busting compiler setup
 if (mongoose.models.Game) {
     delete mongoose.models.Game;
 }

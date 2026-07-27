@@ -37,4 +37,5 @@ export interface GameState {
     lastGuessCorrect: boolean | null;
     lastGuessIndex: number | null;
     winnerId: string | null;
+    maxPlayTime: number;
 }
