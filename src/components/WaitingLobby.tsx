@@ -8,7 +8,8 @@ import {
     UserPlus,
     Users,
     Crown,
-    Trash2
+    Trash2,
+    Loader2
 } from 'lucide-react';
 
 interface WaitingLobbyProps {
@@ -23,6 +24,7 @@ interface WaitingLobbyProps {
     myPlayer: Player | null;
     copied: boolean;
     message: string;
+    isPending: boolean; // Add loader check [1]
     onLeave: () => void;
     onCopyRoomCode: () => void;
     onAddLocalPlayer: () => void;
@@ -43,6 +45,7 @@ export default function WaitingLobby({
     myPlayer,
     copied,
     message,
+    isPending,
     onLeave,
     onCopyRoomCode,
     onAddLocalPlayer,
@@ -64,14 +67,15 @@ export default function WaitingLobby({
                         {game.gameplayMode === 'teams' ? '(Teams)' : '(Solo)'}
                     </span>
                     <button
+                        disabled={isPending}
                         onClick={onLeave}
-                        className="text-neutral-500 hover:text-red-400 text-xs flex items-center gap-1.5 font-semibold transition"
+                        className="text-neutral-500 hover:text-red-400 text-xs flex items-center gap-1.5 font-semibold transition disabled:opacity-50"
                     >
                         <LogOut className="w-3.5 h-3.5" /> Quit Match
                     </button>
                 </div>
 
-                {/* Dynamic code sharing (Online mode) */}
+                {/* Dynamic code sharing */}
                 {activeModeType === 'online' && (
                     <div className="py-2 flex items-center justify-between border-b border-zinc-900">
                         <div>
@@ -102,6 +106,7 @@ export default function WaitingLobby({
                             <input
                                 type="text"
                                 maxLength={15}
+                                disabled={isPending}
                                 className="flex-1 p-3 rounded-xl bg-zinc-900/60 border border-zinc-850 text-sm text-white focus:outline-none"
                                 placeholder="Enter Player Name"
                                 value={localInputName}
@@ -109,15 +114,16 @@ export default function WaitingLobby({
                             />
                             <button
                                 onClick={onAddLocalPlayer}
-                                disabled={!localInputName.trim()}
-                                className="bg-yellow-500 text-neutral-950 font-bold px-4 rounded-xl text-xs transition disabled:opacity-50"
+                                disabled={!localInputName.trim() || isPending}
+                                className="bg-yellow-500 text-neutral-950 font-bold px-4 rounded-xl text-xs transition disabled:opacity-50 flex items-center gap-1.5 h-12"
                             >
-                                Add
+                                {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Add'}
                             </button>
                         </div>
                         {game.gameplayMode === 'teams' && (
                             <div className="grid grid-cols-2 gap-2 bg-zinc-950/80 p-1.5 rounded-xl border border-zinc-900">
                                 <button
+                                    disabled={isPending}
                                     onClick={() => setLocalInputTeam('A')}
                                     className={`py-1.5 rounded-lg text-xs font-bold transition duration-300 ${localInputTeam === 'A' ? 'bg-blue-600 text-white shadow-lg' : 'text-neutral-400'
                                         }`}
@@ -125,6 +131,7 @@ export default function WaitingLobby({
                                     Blue Team
                                 </button>
                                 <button
+                                    disabled={isPending}
                                     onClick={() => setLocalInputTeam('B')}
                                     className={`py-1.5 rounded-lg text-xs font-bold transition duration-300 ${localInputTeam === 'B' ? 'bg-red-600 text-white shadow-lg' : 'text-neutral-400'
                                         }`}
@@ -144,28 +151,30 @@ export default function WaitingLobby({
                         </h3>
                         <div className="grid grid-cols-2 gap-3">
                             <button
+                                disabled={isPending}
                                 onClick={() => onSelectTeam('A')}
-                                className={`py-2.5 rounded-xl font-bold text-xs border transition duration-300 ${myPlayer.teamId === 'A'
-                                        ? 'bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-500/10'
+                                className={`py-2.5 rounded-xl font-bold text-xs border transition duration-300 flex items-center justify-center gap-1.5 ${myPlayer.teamId === 'A'
+                                        ? 'bg-blue-600 border-blue-500 text-white shadow-lg'
                                         : 'bg-zinc-900/60 border-zinc-800 text-zinc-400'
                                     }`}
                             >
-                                Blue Team (A)
+                                {isPending && myPlayer.teamId === 'A' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : 'Blue Team (A)'}
                             </button>
                             <button
+                                disabled={isPending}
                                 onClick={() => onSelectTeam('B')}
-                                className={`py-3.5 rounded-xl font-bold text-xs border transition duration-300 ${myPlayer.teamId === 'B'
-                                        ? 'bg-red-600 border-red-500 text-white shadow-lg shadow-red-500/10'
+                                className={`py-2.5 rounded-xl font-bold text-xs border transition duration-300 flex items-center justify-center gap-1.5 ${myPlayer.teamId === 'B'
+                                        ? 'bg-red-600 border-red-500 text-white shadow-lg'
                                         : 'bg-zinc-900/60 border-zinc-800 text-zinc-400'
                                     }`}
                             >
-                                Red Team (B)
+                                {isPending && myPlayer.teamId === 'B' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : 'Red Team (B)'}
                             </button>
                         </div>
                     </div>
                 )}
 
-                {/* Active roster listing */}
+                {/* Registered Roster */}
                 <div className="flex-1 flex flex-col justify-start pt-2">
                     <div className="flex justify-between items-center mb-3">
                         <h3 className="text-xs uppercase tracking-widest text-zinc-500 flex items-center gap-1.5">
@@ -190,21 +199,22 @@ export default function WaitingLobby({
                                     <div className="flex items-center gap-2">
                                         {game.gameplayMode === 'teams' && p.teamId && (
                                             <span
-                                                className={`text-[9px] font-bold tracking-widest px-2 py-0.5 rounded-md ${p.teamId === 'A' ? 'bg-blue-600/25 text-blue-400 border border-blue-500/10' : 'bg-red-600/25 text-red-400 border border-red-500/10'
+                                                className={`text-[9px] font-bold tracking-widest px-2 py-0.5 rounded-md ${p.teamId === 'A' ? 'bg-blue-600/25 text-blue-400' : 'bg-red-600/25 text-red-400'
                                                     }`}
                                             >
                                                 {p.teamId === 'A' ? 'Blue' : 'Red'}
                                             </span>
                                         )}
                                         {isPlayerHost && activeModeType === 'online' && (
-                                            <span className="text-[9px] font-bold tracking-widest bg-orange-500/10 text-[#ff5722] px-2.5 py-0.5 rounded-md border border-orange-500/20 uppercase flex items-center gap-1">
+                                            <span className="text-[10px] font-bold tracking-widest bg-orange-500/10 text-[#ff5722] px-2.5 py-1 rounded-md border border-orange-500/20 uppercase flex items-center gap-1">
                                                 <Crown className="w-3 h-3" /> Host
                                             </span>
                                         )}
                                         {activeModeType === 'local' && (
                                             <button
+                                                disabled={isPending}
                                                 onClick={() => onRemoveLocalPlayer(p.id)}
-                                                className="p-1 text-zinc-600 hover:text-red-400 transition"
+                                                className="p-1 text-zinc-600 hover:text-red-400 transition disabled:opacity-50"
                                             >
                                                 <Trash2 className="w-4 h-4" />
                                             </button>
@@ -222,13 +232,19 @@ export default function WaitingLobby({
                 {isHost || activeModeType === 'local' ? (
                     <div>
                         <button
-                            disabled={(game.players || []).length < (game.gameplayMode === 'teams' ? 2 : 1)}
+                            disabled={(game.players || []).length < (game.gameplayMode === 'teams' ? 2 : 1) || isPending}
                             onClick={onStartGame}
-                            className="w-full bg-[#ff5722] hover:bg-orange-600 disabled:bg-zinc-900 disabled:text-zinc-600 disabled:shadow-none text-white font-extrabold py-4 px-4 rounded-xl transition shadow-lg shadow-orange-500/15 text-xs tracking-wider"
+                            className="w-full bg-[#ff5722] hover:bg-orange-600 disabled:bg-zinc-900 disabled:text-zinc-600 disabled:shadow-none text-white font-extrabold py-4 px-4 rounded-xl transition shadow-lg shadow-orange-500/15 text-xs tracking-wider flex items-center justify-center gap-2"
                         >
-                            {(game.players || []).length < (game.gameplayMode === 'teams' ? 2 : 1)
-                                ? 'Need more Players'
-                                : 'Start Match Session'}
+                            {isPending ? (
+                                <>
+                                    <Loader2 className="w-4 h-4 animate-spin" /> CONFIGURING_SESSION...
+                                </>
+                            ) : (
+                                (game.players || []).length < (game.gameplayMode === 'teams' ? 2 : 1)
+                                    ? 'Need more Players'
+                                    : 'Start Match Session'
+                            )}
                         </button>
                     </div>
                 ) : (

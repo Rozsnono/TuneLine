@@ -1,7 +1,7 @@
 'use client';
 
 import { GameState, Player } from '@/types/game';
-import { Pause, Play, AlertTriangle } from 'lucide-react';
+import { Pause, Play, AlertTriangle, Loader2 } from 'lucide-react';
 
 interface MusicPlayerProps {
     game: GameState;
@@ -10,6 +10,7 @@ interface MusicPlayerProps {
     canPlayActiveTurn: boolean;
     activePlayer: Player | null;
     activeTimelineOwnerName: string;
+    isPending: boolean; // Add loader check [1]
     onToggleAudio: () => void;
     onReportBroken: () => void;
 }
@@ -21,6 +22,7 @@ export default function MusicPlayer({
     canPlayActiveTurn,
     activePlayer,
     activeTimelineOwnerName,
+    isPending,
     onToggleAudio,
     onReportBroken,
 }: MusicPlayerProps) {
@@ -28,7 +30,7 @@ export default function MusicPlayer({
         <div className="w-full flex flex-col items-center py-4 select-none">
             <div className="relative w-56 h-56 flex items-center justify-center mb-6">
 
-                {/* ROTATING VINYL RECORD (Sits directly on page background) */}
+                {/* ROTATING VINYL RECORD */}
                 <div
                     className="absolute w-56 h-56 rounded-full border-4 border-zinc-800 shadow-[0_12px_45px_rgba(0,0,0,0.75)] overflow-hidden animate-spin [animation-duration:6s]"
                     style={{
@@ -47,11 +49,12 @@ export default function MusicPlayer({
                     <div className="absolute top-6 right-16 w-3 h-3 rounded-full bg-orange-500/70 shadow-[0_0_10px_rgba(255,87,34,0.6)]"></div>
                 </div>
 
-                {/* STATIC CENTER SPINDLE PLAY BUTTON (Safety Orange Glow) */}
+                {/* STATIC CENTER SPINDLE PLAY BUTTON */}
                 <div className="w-20 h-20 rounded-full absolute bg-zinc-950 border border-zinc-900 flex items-center justify-center shadow-inner z-10">
                     <button
+                        disabled={isPending}
                         onClick={onToggleAudio}
-                        className="w-14 h-14 rounded-full bg-[#ff5722] hover:bg-[#ff6c37] transition-all duration-300 flex items-center justify-center cursor-pointer shadow-[0_2px_12px_rgba(255,87,34,0.45)] hover:shadow-[0_2px_18px_rgba(255,87,34,0.65)] active:scale-95 border border-[#ff6c37]/50"
+                        className="w-14 h-14 rounded-full bg-[#ff5722] hover:bg-[#ff6c37] transition-all duration-300 flex items-center justify-center cursor-pointer shadow-[0_2px_12px_rgba(255,87,34,0.45)] hover:shadow-[0_2px_18px_rgba(255,87,34,0.65)] active:scale-95 border border-[#ff6c37]/50 disabled:opacity-50"
                     >
                         {isPlaying ? (
                             <Pause className="w-5 h-5 text-white" fill="white" />
@@ -106,10 +109,19 @@ export default function MusicPlayer({
             {/* Skip/Flag Handler */}
             {canPlayActiveTurn && game.status === 'playing' && (
                 <button
+                    disabled={isPending}
                     onClick={onReportBroken}
-                    className="mt-4 text-[9px] uppercase tracking-wider text-zinc-500 hover:text-red-400 flex items-center gap-1.5 transition active:scale-95"
+                    className="mt-4 text-[9px] uppercase tracking-wider text-zinc-500 hover:text-red-400 flex items-center justify-center gap-1.5 transition active:scale-95 disabled:opacity-50"
                 >
-                    <AlertTriangle className="w-3.5 h-3.5 text-yellow-600" /> [ SKIP_BROKEN_SONG ]
+                    {isPending ? (
+                        <>
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" /> REPORTING_TRACK...
+                        </>
+                    ) : (
+                        <>
+                            <AlertTriangle className="w-3.5 h-3.5 text-yellow-600" /> [ SKIP_BROKEN_SONG ]
+                        </>
+                    )}
                 </button>
             )}
         </div>

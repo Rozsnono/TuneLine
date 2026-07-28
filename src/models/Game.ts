@@ -92,6 +92,7 @@ const GameSchema = new Schema<IGame>({
     lastGuessCorrect: { type: Boolean, default: null },
     lastGuessIndex: { type: Number, default: null },
     winnerId: { type: String, default: null },
+    createdAt: { type: Date, default: Date.now, expires: '1d' }
 }, { timestamps: true });
 
 if (mongoose.models.Game) {

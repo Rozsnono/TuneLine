@@ -1,12 +1,13 @@
 'use client';
 
-import { Trophy, RotateCcw, LogOut } from 'lucide-react';
+import { Trophy, RotateCcw, LogOut, Loader2 } from 'lucide-react';
 import { GameState } from '@/types/game';
 
 interface FinishedProps {
     game: GameState;
     isHost: boolean;
     activeModeType: 'local' | 'online';
+    isPending: boolean; // Add loader check [1]
     onRestart: () => void;
     onLeave: () => void;
 }
@@ -15,6 +16,7 @@ export default function Finished({
     game,
     isHost,
     activeModeType,
+    isPending,
     onRestart,
     onLeave
 }: FinishedProps) {
@@ -50,18 +52,28 @@ export default function Finished({
                 {(isHost || activeModeType === 'local') && (
                     <button
                         onClick={onRestart}
-                        className="w-full bg-[#ff5722] hover:bg-orange-600 text-white font-bold py-4 px-4 rounded-xl transition flex items-center justify-center gap-2 text-xs tracking-wider shadow-lg shadow-orange-500/10"
+                        disabled={isPending}
+                        className="w-full bg-[#ff5722] hover:bg-orange-600 text-white font-bold py-4 px-4 rounded-xl transition flex items-center justify-center gap-2 text-xs tracking-wider shadow-lg shadow-orange-500/10 disabled:opacity-50"
                     >
-                        <RotateCcw className="w-4 h-4" /> Restart
+                        {isPending ? (
+                            <>
+                                <Loader2 className="w-4 h-4 animate-spin" /> RESTARTING...
+                            </>
+                        ) : (
+                            <>
+                                <RotateCcw className="w-4 h-4" /> Restart
+                            </>
+                        )}
                     </button>
                 )}
                 <button
                     onClick={onLeave}
-                    className="w-full bg-zinc-900 hover:bg-zinc-850 text-white font-bold py-4 px-4 rounded-xl border border-zinc-800 transition text-xs tracking-wider"
+                    disabled={isPending}
+                    className="w-full bg-zinc-900 hover:bg-zinc-800 text-white font-bold py-4 px-4 rounded-xl border border-zinc-800 transition text-xs tracking-wider disabled:opacity-50"
                 >
                     Exit Room
                 </button>
             </div>
         </div>
     );
-}   
+}

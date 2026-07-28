@@ -39,4 +39,6 @@ export interface GameState {
     winnerId: string | null;
     maxPlayTime: number;
     isTokenPurchase: boolean;
+    targetScore: number;
+
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronLeft, Sparkles } from 'lucide-react';
+import { ChevronLeft, Sparkles, Loader2 } from 'lucide-react';
 
 interface OnlineSetupProps {
     setupGameplay: 'individual' | 'teams';
@@ -9,6 +9,7 @@ interface OnlineSetupProps {
     setPlayerName: (val: string) => void;
     roomInput: string;
     setRoomInput: (val: string) => void;
+    isPending: boolean; // Add loader check [1]
     onGenerateCode: () => void;
     onBack: () => void;
     onSubmit: (roomId: string) => void;
@@ -22,6 +23,7 @@ export default function OnlineSetup({
     setPlayerName,
     roomInput,
     setRoomInput,
+    isPending,
     onGenerateCode,
     onBack,
     onSubmit,
@@ -34,6 +36,7 @@ export default function OnlineSetup({
             <div className="space-y-6">
                 <div className="flex items-center gap-4">
                     <button
+                        disabled={isPending}
                         onClick={onBack}
                         className="p-2.5 bg-zinc-950/60 hover:bg-zinc-800 rounded-xl border border-zinc-800 text-neutral-400 hover:text-white transition active:scale-90"
                     >
@@ -53,6 +56,7 @@ export default function OnlineSetup({
                         <div className="grid grid-cols-2 gap-2 bg-zinc-950/80 p-1.5 rounded-xl border border-zinc-900 shadow-inner">
                             <button
                                 type="button"
+                                disabled={isPending}
                                 onClick={() => setSetupGameplay('individual')}
                                 className={`py-2.5 rounded-lg text-xs font-bold transition duration-300 ${setupGameplay === 'individual'
                                         ? 'bg-[#ff5722] text-white shadow-md'
@@ -63,6 +67,7 @@ export default function OnlineSetup({
                             </button>
                             <button
                                 type="button"
+                                disabled={isPending}
                                 onClick={() => setSetupGameplay('teams')}
                                 className={`py-2.5 rounded-lg text-xs font-bold transition duration-300 ${setupGameplay === 'teams'
                                         ? 'bg-[#ff5722] text-white shadow-md'
@@ -79,6 +84,7 @@ export default function OnlineSetup({
                         <input
                             type="text"
                             maxLength={15}
+                            disabled={isPending}
                             className="w-full p-3.5 rounded-xl bg-zinc-900/60 border border-zinc-850 focus:outline-none focus:ring-2 focus:ring-[#ff5722] text-sm text-white"
                             placeholder="Enter Display Name"
                             value={playerName}
@@ -92,6 +98,7 @@ export default function OnlineSetup({
                             <input
                                 type="text"
                                 maxLength={6}
+                                disabled={isPending}
                                 className="flex-1 p-3.5 rounded-xl bg-zinc-900/60 border border-zinc-855 uppercase font-bold text-center tracking-widest focus:outline-none focus:ring-2 focus:ring-[#ff5722] text-sm text-white"
                                 placeholder="CODE"
                                 value={roomInput}
@@ -99,6 +106,7 @@ export default function OnlineSetup({
                             />
                             <button
                                 type="button"
+                                disabled={isPending}
                                 onClick={onGenerateCode}
                                 className="bg-zinc-900 hover:bg-neutral-750 text-neutral-300 px-5 rounded-xl border border-zinc-800 text-xs font-bold active:scale-95 transition"
                             >
@@ -112,9 +120,16 @@ export default function OnlineSetup({
             <div className="space-y-4">
                 <button
                     onClick={() => onSubmit(roomInput)}
-                    className="w-full bg-[#f4f4f5] hover:bg-white text-zinc-950 font-extrabold py-4 px-4 rounded-xl transition active:scale-95 text-xs tracking-wider"
+                    disabled={isPending}
+                    className="w-full bg-[#f4f4f5] hover:bg-white text-zinc-950 font-extrabold py-4 px-4 rounded-xl transition active:scale-95 text-xs tracking-wider flex items-center justify-center gap-2"
                 >
-                    JOIN_MATCH_LOBBY
+                    {isPending ? (
+                        <>
+                            <Loader2 className="w-4 h-4 animate-spin" /> LOADING_MATCH...
+                        </>
+                    ) : (
+                        'JOIN_MATCH_LOBBY'
+                    )}
                 </button>
 
                 {message && (

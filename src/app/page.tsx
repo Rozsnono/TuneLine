@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { GameState } from '@/types/game';
-import { motion, AnimatePresence } from 'framer-motion'; // Clean spring transitions [1]
+import { motion, AnimatePresence } from 'framer-motion';
 
 // Modular view components
 import ModeSelection from '@/components/ModeSelection';
@@ -27,7 +27,10 @@ export default function Home() {
   const [message, setMessage] = useState<string>('');
   const [copied, setCopied] = useState<boolean>(false);
 
-  // Configuration Setup States [2]
+  // Centralized pending transition state [1]
+  const [isPending, setIsPending] = useState<boolean>(false);
+
+  // Configuration Setup States
   const [setupGameplay, setSetupGameplay] = useState<'individual' | 'teams'>('individual');
   const [targetScore, setTargetScore] = useState<number>(10);
   const [maxPlayersPerTeam, setMaxPlayersPerTeam] = useState<number>(4);
@@ -45,7 +48,7 @@ export default function Home() {
   const [ytReady, setYtReady] = useState<boolean>(false);
   const playerRef = useRef<any>(null);
 
-  // Scoped turn parameters (safe optional checks)
+  // Scoped turn parameters
   const activePlayer = game ? (game.players || []).find((p) => p.id === game.currentTurnPlayerId) : null;
   const myPlayer = game ? (game.players || []).find((p) => p.id === playerId) : null;
   const isMyTurn = game ? game.currentTurnPlayerId === playerId : false;
@@ -53,7 +56,7 @@ export default function Home() {
   const activeModeType = roomId.startsWith('LOC_') ? 'local' : (game ? game.mode : 'online');
   const canPlayActiveTurn = game ? (isMyTurn || activeModeType === 'local') : false;
 
-  // --- High-performance auto play-limit stopwatch hook [1] ---
+  // High-performance auto play-limit stopwatch hook
   useEffect(() => {
     let stopwatch: any;
     if (isPlaying && game?.maxPlayTime) {
@@ -72,10 +75,12 @@ export default function Home() {
     };
   }, [isPlaying, game?.currentCard?.youtubeId, game?.maxPlayTime]);
 
-  // --- Hoisted State Handlers (TDZ Protected) ---
+  // --- Hoisted State Handlers (With pending overrides wrapped) ---
   function attemptSessionRestoration(targetRoom: string, pId: string, name: string) {
+    setIsPending(true);
     fetch(`${API_BASE_URL}/api/game?roomId=${targetRoom}`)
       .then((res) => {
+        setIsPending(false);
         if (res.ok) {
           res.json().then((data) => {
             const activeGame: GameState = data.game;
@@ -90,7 +95,10 @@ export default function Home() {
           });
         }
       })
-      .catch((err) => console.error('Lobby restoration failed', err));
+      .catch((err) => {
+        setIsPending(false);
+        console.error('Lobby restoration failed', err);
+      });
   }
 
   function toggleAudio() {
@@ -124,6 +132,7 @@ export default function Home() {
       return;
     }
 
+    setIsPending(true);
     fetch(`${API_BASE_URL}/api/game`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -140,6 +149,7 @@ export default function Home() {
       }),
     })
       .then((res) => {
+        setIsPending(false);
         if (res.ok) {
           res.json().then((data) => {
             setGame(data.game);
@@ -158,7 +168,10 @@ export default function Home() {
           });
         }
       })
-      .catch(() => setMessage('Unable to reach the game server.'));
+      .catch(() => {
+        setIsPending(false);
+        setMessage('Unable to reach the game server.');
+      });
   }
 
   function handleCreateLocalSession() {
@@ -166,9 +179,9 @@ export default function Home() {
     handleJoinOrCreate(localCode, 'local');
   }
 
-  // Add Local Player
   function handleAddLocalPlayer() {
     if (!localInputName.trim()) return;
+    setIsPending(true);
     fetch(`${API_BASE_URL}/api/game`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -180,6 +193,7 @@ export default function Home() {
       }),
     })
       .then((res) => {
+        setIsPending(false);
         if (res.ok) {
           setLocalInputName('');
           res.json().then((data) => {
@@ -192,10 +206,14 @@ export default function Home() {
           });
         }
       })
-      .catch(() => setMessage('Failed to add local player'));
+      .catch(() => {
+        setIsPending(false);
+        setMessage('Failed to add local player');
+      });
   }
 
   function handleRemoveLocalPlayer(targetLocalId: string) {
+    setIsPending(true);
     fetch(`${API_BASE_URL}/api/game`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -206,16 +224,21 @@ export default function Home() {
       }),
     })
       .then((res) => {
+        setIsPending(false);
         if (res.ok) {
           res.json().then((data) => {
             setGame(data.game);
           });
         }
       })
-      .catch((err) => console.error(err));
+      .catch((err) => {
+        setIsPending(false);
+        console.error(err);
+      });
   }
 
   function handleSelectTeam(targetTeamId: 'A' | 'B') {
+    setIsPending(true);
     fetch(`${API_BASE_URL}/api/game`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -227,6 +250,7 @@ export default function Home() {
       }),
     })
       .then((res) => {
+        setIsPending(false);
         if (res.ok) {
           res.json().then((data) => {
             setGame(data.game);
@@ -237,7 +261,10 @@ export default function Home() {
           });
         }
       })
-      .catch(() => setMessage('Error updating team assignment.'));
+      .catch(() => {
+        setIsPending(false);
+        setMessage('Error updating team assignment.');
+      });
   }
 
   function generateRoomCode() {
@@ -261,12 +288,14 @@ export default function Home() {
   }
 
   function handleStartGame() {
+    setIsPending(true);
     fetch(`${API_BASE_URL}/api/game`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ roomId, action: 'start' }),
     })
       .then((res) => {
+        setIsPending(false);
         if (res.ok) {
           setMessage('');
           res.json().then((data) => {
@@ -278,11 +307,15 @@ export default function Home() {
           });
         }
       })
-      .catch(() => setMessage('Network error launching the game.'));
+      .catch(() => {
+        setIsPending(false);
+        setMessage('Network error launching the game.');
+      });
   }
 
   function submitPlacement() {
     if (selectedSlot === null) return;
+    setIsPending(true);
     fetch(`${API_BASE_URL}/api/game`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -294,6 +327,7 @@ export default function Home() {
       }),
     })
       .then((res) => {
+        setIsPending(false);
         if (res.ok) {
           setSelectedSlot(null);
           setMessage('');
@@ -303,19 +337,24 @@ export default function Home() {
           });
         }
       })
-      .catch(() => setMessage('Network transmission lost.'));
+      .catch(() => {
+        setIsPending(false);
+        setMessage('Network transmission lost.');
+      });
   }
 
   function revealMetadata() {
     try {
       stopAudio();
     } catch (e) { }
+    setIsPending(true);
     fetch(`${API_BASE_URL}/api/game`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ roomId, action: 'reveal', playerId }),
     })
       .then((res) => {
+        setIsPending(false);
         if (res.ok) {
           setMessage('');
         } else {
@@ -324,10 +363,14 @@ export default function Home() {
           });
         }
       })
-      .catch(() => setMessage('Reveal failed.'));
+      .catch(() => {
+        setIsPending(false);
+        setMessage('Reveal failed.');
+      });
   }
 
   function resolveTurnWithMetadata(metadataChoice: 'none' | 'artist' | 'title' | 'both', recipientId?: string) {
+    setIsPending(true);
     fetch(`${API_BASE_URL}/api/game`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -340,6 +383,7 @@ export default function Home() {
       }),
     })
       .then((res) => {
+        setIsPending(false);
         if (res.ok) {
           setMessage('');
           res.json().then((data) => {
@@ -351,7 +395,10 @@ export default function Home() {
           });
         }
       })
-      .catch(() => setMessage('Failed to complete action'));
+      .catch(() => {
+        setIsPending(false);
+        setMessage('Failed to complete action');
+      });
   }
 
   function reportBrokenSong() {
@@ -359,6 +406,7 @@ export default function Home() {
     try {
       stopAudio();
     } catch (e) { }
+    setIsPending(true);
     fetch(`${API_BASE_URL}/api/game`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -369,6 +417,7 @@ export default function Home() {
       }),
     })
       .then((res) => {
+        setIsPending(false);
         if (res.ok) {
           setMessage('Song reported and skipped successfully.');
           setSelectedSlot(null);
@@ -383,7 +432,10 @@ export default function Home() {
           });
         }
       })
-      .catch(() => setMessage('Network error reporting song.'));
+      .catch(() => {
+        setIsPending(false);
+        setMessage('Network error reporting song.');
+      });
   }
 
   function submitSteal() {
@@ -409,6 +461,7 @@ export default function Home() {
       return;
     }
 
+    setIsPending(true);
     fetch(`${API_BASE_URL}/api/game`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -421,6 +474,7 @@ export default function Home() {
       }),
     })
       .then((res) => {
+        setIsPending(false);
         if (res.ok) {
           setMessage('Steal successful! Turn resolved.');
           setSelectedSlot(null);
@@ -436,10 +490,14 @@ export default function Home() {
           setSelectedSlot(null);
         }
       })
-      .catch(() => setMessage('Steal request transmission error.'));
+      .catch(() => {
+        setIsPending(false);
+        setMessage('Steal request transmission error.');
+      });
   }
 
   function handleBuyCard() {
+    setIsPending(true);
     fetch(`${API_BASE_URL}/api/game`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -450,6 +508,7 @@ export default function Home() {
       })
     })
       .then((res) => {
+        setIsPending(false);
         if (res.ok) {
           setMessage('Card purchased with 3 Tokens! Auto-inserted into board.');
           res.json().then((data) => {
@@ -461,10 +520,12 @@ export default function Home() {
           });
         }
       })
-      .catch(() => setMessage('Token exchange network error.'));
+      .catch(() => {
+        setIsPending(false);
+        setMessage('Token exchange network error.');
+      });
   }
 
-  // RESTORED: handleLeaveGame is now fully defined [1]
   function handleLeaveGame() {
     try {
       stopAudio();
@@ -640,6 +701,7 @@ export default function Home() {
                 setMaxPlayersPerTeam={setMaxPlayersPerTeam}
                 maxPlayTime={maxPlayTime}
                 setMaxPlayTime={setMaxPlayTime}
+                isPending={isPending} // Pass load state [1]
                 onBack={() => setPlayModeSelection(null)}
                 onSubmit={handleCreateLocalSession}
                 message={message}
@@ -663,6 +725,7 @@ export default function Home() {
                 setPlayerName={setPlayerName}
                 roomInput={roomInput}
                 setRoomInput={setRoomInput}
+                isPending={isPending} // Pass load state [1]
                 onGenerateCode={generateRoomCode}
                 onBack={() => setPlayModeSelection(null)}
                 onSubmit={handleJoinOrCreate}
@@ -692,6 +755,7 @@ export default function Home() {
                 myPlayer={myPlayer as any}
                 copied={copied}
                 message={message}
+                isPending={isPending} // Pass load state [1]
                 onLeave={handleLeaveGame}
                 onCopyRoomCode={copyRoomCode}
                 onAddLocalPlayer={handleAddLocalPlayer}
@@ -715,6 +779,7 @@ export default function Home() {
                 game={game}
                 isHost={isHost}
                 activeModeType={activeModeType}
+                isPending={isPending} // Pass load state [1]
                 onRestart={handleStartGame}
                 onLeave={handleLeaveGame}
               />
@@ -740,6 +805,7 @@ export default function Home() {
                 canPlayActiveTurn={canPlayActiveTurn}
                 isPlaying={isPlaying}
                 playerRef={playerRef}
+                isPending={isPending} // Pass load state [1]
                 onToggleAudio={toggleAudio}
                 onStopAudio={stopAudio}
                 onReportBroken={reportBrokenSong}
