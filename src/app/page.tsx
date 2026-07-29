@@ -45,7 +45,9 @@ export default function Home() {
 
   // Audio Playback States (Single recycled reference)
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(
+    typeof window !== 'undefined' ? new Audio() : null
+  );
 
   // Scoped turn parameters
   const activePlayer = game ? (game.players || []).find((p) => p.id === game.currentTurnPlayerId) : null;
@@ -142,6 +144,7 @@ export default function Home() {
     }
   }
 
+  // Stop audio
   function stopAudio() {
     const audio = audioRef.current;
     if (!audio) return;
@@ -347,6 +350,7 @@ export default function Home() {
       });
   }
 
+  // CRITICAL FIX: Added active setGame updates upon successful guess verification [1]
   function submitPlacement() {
     if (selectedSlot === null) return;
     setIsPending(true);
@@ -365,6 +369,9 @@ export default function Home() {
         if (res.ok) {
           setSelectedSlot(null);
           setMessage('');
+          res.json().then((data) => {
+            setGame(data.game); // Instant visual sync on client [1]
+          });
         } else {
           res.json().then((data) => {
             setMessage(data.error);
@@ -377,6 +384,7 @@ export default function Home() {
       });
   }
 
+  // CRITICAL FIX: Added active setGame updates upon successful metadata answer reveals [1]
   function revealMetadata() {
     try {
       stopAudio();
@@ -391,6 +399,9 @@ export default function Home() {
         setIsPending(false);
         if (res.ok) {
           setMessage('');
+          res.json().then((data) => {
+            setGame(data.game); // Instant visual sync on client [1]
+          });
         } else {
           res.json().then((data) => {
             setMessage(data.error);
@@ -560,6 +571,7 @@ export default function Home() {
       });
   }
 
+  // handleLeaveGame
   function handleLeaveGame() {
     try {
       stopAudio();
@@ -574,7 +586,7 @@ export default function Home() {
     }
   }
 
-  // Hydration Mount Recovery Hook: Instantiates the single persistent Audio object safely on mount
+  // Hydration Mount Recovery Hook: Instantiates the single persistent Audio object on mount (WITHOUT any cross-origin flags)
   useEffect(() => {
     let id = localStorage.getItem('hitster_player_id');
     if (!id) {
@@ -583,16 +595,16 @@ export default function Home() {
     }
     setPlayerId(id);
 
-    // Safe client-side instantiation
+    // Instantiate standard HTML5 Audio once [1]
     const audioInstance = new Audio();
     audioRef.current = audioInstance;
 
-    // Bind event listeners
+    // Sync HTML5 events natively with the controller state
     audioInstance.onplay = () => setIsPlaying(true);
     audioInstance.onpause = () => setIsPlaying(false);
     audioInstance.onended = () => setIsPlaying(false);
 
-    // Active diagnostic handler to report exact missing files
+    // Active diagnostic handler to report exact missing files [1]
     audioInstance.onerror = () => {
       const src = audioInstance.src;
       console.error("Audio Load Error on source:", src);
@@ -640,7 +652,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#010103] flex justify-center items-center">
+    <div className="min-h-screen bg-[#010103] flex justify-center items-center animate-fade-in">
       {/* CENTRAL MOBILE VIEWPORT WRAPPER [1] */}
       <div className="w-full max-w-md min-h-screen bg-[#050508] shadow-[0_0_80px_rgba(0,0,0,0.85)] md:border-x md:border-zinc-900/60 relative flex flex-col overflow-hidden justify-between">
 
