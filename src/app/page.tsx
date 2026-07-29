@@ -27,7 +27,7 @@ export default function Home() {
   const [message, setMessage] = useState<string>('');
   const [copied, setCopied] = useState<boolean>(false);
 
-  // Centralized pending transition state [1]
+  // Centralized pending transition state
   const [isPending, setIsPending] = useState<boolean>(false);
 
   // Configuration Setup States
@@ -43,10 +43,9 @@ export default function Home() {
   const [isStealing, setIsStealing] = useState<boolean>(false);
   const [localStealerId, setLocalStealerId] = useState<string>('');
 
-  // Audio Playback States
+  // Audio Playback States (Single recycled reference)
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [ytReady, setYtReady] = useState<boolean>(false);
-  const playerRef = useRef<any>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Scoped turn parameters
   const activePlayer = game ? (game.players || []).find((p) => p.id === game.currentTurnPlayerId) : null;
@@ -73,7 +72,28 @@ export default function Home() {
     return () => {
       if (stopwatch) clearTimeout(stopwatch);
     };
-  }, [isPlaying, game?.currentCard?.youtubeId, game?.maxPlayTime]);
+  }, [isPlaying, game?.currentCard?.id, game?.maxPlayTime]);
+
+  // Recycled local source swapper [1]
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!game?.currentCard?.id || !audio) return;
+
+    // Halt previous stream safely
+    try {
+      audio.pause();
+    } catch (e) { }
+
+    setIsPlaying(false);
+
+    // Swap source to point cleanly to your local public/songs folder [1]
+    const streamUrl = `/songs/${game.currentCard.youtubeId}.mp3`;
+    audio.src = streamUrl;
+
+    // Force the browser to preload and resolve the local source safely [1]
+    audio.load();
+
+  }, [game?.currentCard?.id, game?.status]); // Re-run when transitioning into active play status [1]
 
   // --- Hoisted State Handlers (With pending overrides wrapped) ---
   function attemptSessionRestoration(targetRoom: string, pId: string, name: string) {
@@ -102,19 +122,33 @@ export default function Home() {
   }
 
   function toggleAudio() {
-    if (!playerRef.current) return;
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    // Safety fallback: Prevent playing if the source has not resolved yet [1]
+    if (!audio.src || audio.src === '' || (typeof window !== 'undefined' && audio.src === window.location.href)) {
+      setMessage('Audio track is loading. Please wait a moment.');
+      return;
+    }
+
     if (isPlaying) {
-      playerRef.current.pauseVideo();
-      setIsPlaying(false);
+      audio.pause();
     } else {
-      playerRef.current.playVideo();
-      setIsPlaying(true);
+      // Gracefully catch and log autoplay permission blocks
+      audio.play().catch((e) => {
+        console.warn('Playback blocked by browser autoplay policy.', e);
+        setMessage('Autoplay blocked. Tap anywhere on screen first to enable.');
+      });
     }
   }
 
   function stopAudio() {
-    if (!playerRef.current) return;
-    playerRef.current.stopVideo();
+    const audio = audioRef.current;
+    if (!audio) return;
+    try {
+      audio.pause();
+      audio.currentTime = 0; // Rewind timeline to start
+    } catch (e) { }
     setIsPlaying(false);
   }
 
@@ -540,7 +574,7 @@ export default function Home() {
     }
   }
 
-  // Hydration Mount Recovery Hook
+  // Hydration Mount Recovery Hook: Instantiates the single persistent Audio object safely on mount
   useEffect(() => {
     let id = localStorage.getItem('hitster_player_id');
     if (!id) {
@@ -548,6 +582,23 @@ export default function Home() {
       localStorage.setItem('hitster_player_id', id);
     }
     setPlayerId(id);
+
+    // Safe client-side instantiation
+    const audioInstance = new Audio();
+    audioRef.current = audioInstance;
+
+    // Bind event listeners
+    audioInstance.onplay = () => setIsPlaying(true);
+    audioInstance.onpause = () => setIsPlaying(false);
+    audioInstance.onended = () => setIsPlaying(false);
+
+    // Active diagnostic handler to report exact missing files
+    audioInstance.onerror = () => {
+      const src = audioInstance.src;
+      console.error("Audio Load Error on source:", src);
+      setMessage(`Cannot play: ${src.substring(src.lastIndexOf('/'))}. Please check if the file exists in your public/songs/ folder with the correct name.`);
+      setIsPlaying(false);
+    };
 
     const savedRoomId = localStorage.getItem('hitster_room_id');
     const savedPlayerName = localStorage.getItem('hitster_player_name');
@@ -579,86 +630,14 @@ export default function Home() {
       attemptSessionRestoration(targetRoom, id, savedPlayerName);
     }
 
-    if (typeof window !== 'undefined') {
-      if (!(window as any).YT) {
-        const tag = document.createElement('script');
-        tag.src = 'https://www.youtube.com/iframe_api';
-        const firstScriptTag = document.getElementsByTagName('script')[0];
-        firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag);
-
-        (window as any).onYouTubeIframeAPIReady = () => {
-          setYtReady(true);
-        };
-      } else {
-        setYtReady(true);
+    return () => {
+      if (audioInstance) {
+        try {
+          audioInstance.pause();
+        } catch (e) { }
       }
-    }
+    };
   }, []);
-
-  // Sync YouTube Video Player with Active card references
-  useEffect(() => {
-    if (!ytReady || !game?.currentCard?.youtubeId) return;
-
-    if (playerRef.current) {
-      try {
-        playerRef.current.destroy();
-      } catch (e) {
-        console.error('Failed to clear video instances', e);
-      }
-    }
-
-    setIsPlaying(false);
-
-    playerRef.current = new (window as any).YT.Player('youtube-audio-player', {
-      height: '0',
-      width: '0',
-      videoId: game.currentCard.youtubeId,
-      playerVars: {
-        playsinline: 1,
-        controls: 0,
-        disablekb: 1,
-        fs: 0,
-        rel: 0,
-      },
-      events: {
-        onStateChange: (event: any) => {
-          if (event.data === (window as any).YT.PlayerState.PLAYING) {
-            setIsPlaying(true);
-          } else {
-            setIsPlaying(false);
-          }
-        },
-      },
-    });
-  }, [ytReady, game?.currentCard?.youtubeId]);
-
-  // Unified State Poller (1s)
-  useEffect(() => {
-    if (!roomId || !hasJoined) return;
-
-    const pollInterval = setInterval(async () => {
-      try {
-        const res = await fetch(`${API_BASE_URL}/api/game?roomId=${roomId}`);
-        if (res.ok) {
-          const data = await res.json();
-          setGame(data.game);
-        }
-      } catch (err) {
-        console.error('State sync connection failed', err);
-      }
-    }, 1000);
-
-    return () => clearInterval(pollInterval);
-  }, [roomId, hasJoined]);
-
-  // Turn advance resets
-  useEffect(() => {
-    if (game?.phase === 'placement') {
-      setIsStealing(false);
-      setLocalStealerId('');
-      setSelectedSlot(null);
-    }
-  }, [game?.phase]);
 
   return (
     <div className="min-h-screen bg-[#010103] flex justify-center items-center">
@@ -701,7 +680,7 @@ export default function Home() {
                 setMaxPlayersPerTeam={setMaxPlayersPerTeam}
                 maxPlayTime={maxPlayTime}
                 setMaxPlayTime={setMaxPlayTime}
-                isPending={isPending} // Pass load state [1]
+                isPending={isPending}
                 onBack={() => setPlayModeSelection(null)}
                 onSubmit={handleCreateLocalSession}
                 message={message}
@@ -725,7 +704,7 @@ export default function Home() {
                 setPlayerName={setPlayerName}
                 roomInput={roomInput}
                 setRoomInput={setRoomInput}
-                isPending={isPending} // Pass load state [1]
+                isPending={isPending}
                 onGenerateCode={generateRoomCode}
                 onBack={() => setPlayModeSelection(null)}
                 onSubmit={handleJoinOrCreate}
@@ -755,7 +734,7 @@ export default function Home() {
                 myPlayer={myPlayer as any}
                 copied={copied}
                 message={message}
-                isPending={isPending} // Pass load state [1]
+                isPending={isPending}
                 onLeave={handleLeaveGame}
                 onCopyRoomCode={copyRoomCode}
                 onAddLocalPlayer={handleAddLocalPlayer}
@@ -779,7 +758,7 @@ export default function Home() {
                 game={game}
                 isHost={isHost}
                 activeModeType={activeModeType}
-                isPending={isPending} // Pass load state [1]
+                isPending={isPending}
                 onRestart={handleStartGame}
                 onLeave={handleLeaveGame}
               />
@@ -804,8 +783,8 @@ export default function Home() {
                 myPlayer={myPlayer as any}
                 canPlayActiveTurn={canPlayActiveTurn}
                 isPlaying={isPlaying}
-                playerRef={playerRef}
-                isPending={isPending} // Pass load state [1]
+                playerRef={audioRef} // Pass our recycled native HTMLAudioElement reference directly
+                isPending={isPending}
                 onToggleAudio={toggleAudio}
                 onStopAudio={stopAudio}
                 onReportBroken={reportBrokenSong}
