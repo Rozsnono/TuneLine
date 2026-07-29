@@ -2,6 +2,671 @@ import { ICard } from "@/models/Game";
 
 export const MUSIC_LIBRARY: ICard[] = [
     {
+        "id": "3",
+        "title": "White Christmas",
+        "artist": "Bing Crosby",
+        "year": 1942,
+        "youtubeId": "v5ryZdpEHqM"
+    },
+    {
+        "id": "5",
+        "title": "Boogie Woogie Bugle Boy",
+        "artist": "The Andrews Sisters",
+        "year": 1941,
+        "youtubeId": "OfWc52smNs8"
+    },
+    {
+        "id": "1950_3",
+        "title": "Jailhouse Rock",
+        "artist": "Elvis Presley",
+        "year": 1957,
+        "youtubeId": "PpsUOOfb"
+    },
+    {
+        "id": "1950_5",
+        "title": "Johnny B. Goode",
+        "artist": "Chuck Berry",
+        "year": 1958,
+        "youtubeId": "Y-9Y4CCIWnM"
+    },
+    {
+        "id": "1950_7",
+        "title": "Tutti Frutti",
+        "artist": "Little Richard",
+        "year": 1955,
+        "youtubeId": "F13JNjpNW6c"
+    },
+    {
+        "id": "1950_11",
+        "title": "Great Balls of Fire",
+        "artist": "Jerry Lee Lewis",
+        "year": 1957,
+        "youtubeId": "0VJ1NuAbEBI"
+    },
+    {
+        "id": "1950_15",
+        "title": "What'd I Say",
+        "artist": "Ray Charles",
+        "year": 1959,
+        "youtubeId": "jBYq0AYTj"
+    },
+    {
+        "id": "1950_19",
+        "title": "La Bamba",
+        "artist": "Ritchie Valens",
+        "year": 1958,
+        "youtubeId": "0ymdjg9v8zM"
+    },
+    {
+        "id": "1950_23",
+        "title": "Singin' in the Rain",
+        "artist": "Gene Kelly",
+        "year": 1952,
+        "youtubeId": "StB2WR4Hwdo"
+    },
+    {
+        "id": "1950_25",
+        "title": "Peggy Sue",
+        "artist": "Buddy Holly",
+        "year": 1957,
+        "youtubeId": "Zpni8tmIzaM"
+    },
+    {
+        "id": "1950_27",
+        "title": "Tequila",
+        "artist": "The Champs",
+        "year": 1958,
+        "youtubeId": "U_JFLb1IItM"
+    },
+    {
+        "id": "1950_29",
+        "title": "Put Your Head on My Shoulder",
+        "artist": "Paul Anka",
+        "year": 1959,
+        "youtubeId": "kvazBqAlx58"
+    },
+    {
+        "id": "1960_9",
+        "title": "Like a Rolling Stone",
+        "artist": "Bob Dylan",
+        "year": 1965,
+        "youtubeId": "IwOfCgkyEj0"
+    },
+    {
+        "id": "1960_12",
+        "title": "Rohan az idő",
+        "artist": "Koncz Zsuzsa",
+        "year": 1966,
+        "youtubeId": "f0g3v-PboLM"
+    },
+    {
+        "id": "1960_13",
+        "title": "House of the Rising Sun",
+        "artist": "The Animals",
+        "year": 1964,
+        "youtubeId": "aac5heIaz1M"
+    },
+    {
+        "id": "1960_17",
+        "title": "The Sound of Silence",
+        "artist": "Simon & Garfunkel",
+        "year": 1964,
+        "youtubeId": "NAEppFUWLfc"
+    },
+    {
+        "id": "1960_23",
+        "title": "Ring of Fire",
+        "artist": "Johnny Cash",
+        "year": 1963,
+        "youtubeId": "1WaV2x8GXj0"
+    },
+    {
+        "id": "1960_29",
+        "title": "I Heard It Through The Grapevine",
+        "artist": "Marvin Gaye",
+        "year": 1968,
+        "youtubeId": "wCCfc2vAuDU"
+    },
+    {
+        "id": "1960_38",
+        "title": "Ilyen a természetem",
+        "artist": "Ambrus Kyri",
+        "year": 1966,
+        "youtubeId": "78OmM93LKNg"
+    },
+    {
+        "id": "1960_41",
+        "title": "Fekete Vonat",
+        "artist": "Poór Péter",
+        "year": 1966,
+        "youtubeId": "29OB0_yez6Q"
+    },
+    {
+        "id": "1970_13",
+        "title": "I Will Survive",
+        "artist": "Gloria Gaynor",
+        "year": 1978,
+        "youtubeId": "6dYWe1c3OyU"
+    },
+    {
+        "id": "1970_17",
+        "title": "Daddy Cool",
+        "artist": "Boney M.",
+        "year": 1976,
+        "youtubeId": "aOKhjCM38QQ"
+    },
+    {
+        "id": "1970_18",
+        "title": "Valahol egy lány",
+        "artist": "Koncz Zsuzsa",
+        "year": 1971,
+        "youtubeId": "LPsegzhgBc"
+    },
+    {
+        "id": "1970_32",
+        "title": "Apám hitte",
+        "artist": "Sztevanovity Zorán",
+        "year": 1977,
+        "youtubeId": "rkKS2x6F8CI"
+    },
+    {
+        "id": "1970_35",
+        "title": "No Woman, No Cry",
+        "artist": "Bob Marley",
+        "year": 1974,
+        "youtubeId": "IT8XvzIfi4U"
+    },
+    {
+        "id": "1970_36",
+        "title": "Táncolj még!",
+        "artist": "Szűcs Judith",
+        "year": 1978,
+        "youtubeId": "xYBm6GFEkdw"
+    },
+    {
+        "id": "1970_46",
+        "title": "Léna",
+        "artist": "Omega",
+        "year": 1978,
+        "youtubeId": "KBg_Q-r5KIY"
+    },
+    {
+        "id": "1970_49",
+        "title": "Dream On",
+        "artist": "Aerosmith",
+        "year": 1973,
+        "youtubeId": "89dGC8de0CA"
+    },
+    {
+        "id": "1970_52",
+        "title": "Thank you for the music",
+        "artist": "ABBA",
+        "year": 1977,
+        "youtubeId": "0dcbw4IEY5w"
+    },
+    {
+        "id": "1980_2",
+        "title": "Afrika",
+        "artist": "KFT",
+        "year": 1984,
+        "youtubeId": "M_Pozh8zEzg"
+    },
+    {
+        "id": "1980_9",
+        "title": "Every Breath You Take",
+        "artist": "The Police",
+        "year": 1983,
+        "youtubeId": "iOT_zuDHvVk"
+    },
+    {
+        "id": "1980_13",
+        "title": "Sweet Dreams (Are Made of This)",
+        "artist": "Eurythmics",
+        "year": 1983,
+        "youtubeId": "bG9z-atG7gc"
+    },
+    {
+        "id": "1980_15",
+        "title": "Livin' On A Prayer",
+        "artist": "Bon Jovi",
+        "year": 1986,
+        "youtubeId": "2ognf_oRQWM"
+    },
+    {
+        "id": "1980_21",
+        "title": "Never Gonna Give You Up",
+        "artist": "Rick Astley",
+        "year": 1987,
+        "youtubeId": "dQw4w9WgXcQ"
+    },
+    {
+        "id": "1980_26",
+        "title": "Júlia nem akar a földön járni",
+        "artist": "Napoleon Boulevard",
+        "year": 1988,
+        "youtubeId": "4ugOe7GXhGE"
+    },
+    {
+        "id": "1980_29",
+        "title": "Dancing In the Dark",
+        "artist": "Bruce Springsteen",
+        "year": 1984,
+        "youtubeId": "129kuDCQtHs"
+    },
+    {
+        "id": "1980_30",
+        "title": "Kopaszkutya",
+        "artist": "Hobo Blues Band",
+        "year": 1981,
+        "youtubeId": "I44d_KVpSRs"
+    },
+    {
+        "id": "1980_33",
+        "title": "Total Eclipse of the Heart",
+        "artist": "Bonnie Tyler",
+        "year": 1983,
+        "youtubeId": "f5t2-Q-nO14"
+    },
+    {
+        "id": "1980_34",
+        "title": "Requiem",
+        "artist": "Karthago",
+        "year": 1981,
+        "youtubeId": "MKnAEeZBLtY"
+    },
+    {
+        "id": "1980_36",
+        "title": "Európa",
+        "artist": "Varga Miklós",
+        "year": 1984,
+        "youtubeId": "m9hs0f9DHJs"
+    },
+    {
+        "id": "1980_46",
+        "title": "Álmodtam egy világot magamnak",
+        "artist": "Edda Művek",
+        "year": 1980,
+        "youtubeId": "ekked3K6Byo"
+    },
+    {
+        "id": "1980_48",
+        "title": "Zenevonat",
+        "artist": "LGT",
+        "year": 1982,
+        "youtubeId": "FEoDD7CeDgo"
+    },
+    {
+        "id": "1980_57",
+        "title": "Everybody Wants To Rule The World",
+        "artist": "Tears For Fears",
+        "year": 1985,
+        "youtubeId": "znDgBy2mHbc"
+    },
+    {
+        "id": "1990_3",
+        "title": "...Baby One More Time",
+        "artist": "Britney Spears",
+        "year": 1998,
+        "youtubeId": "nbmVTIYkbOo"
+    },
+    {
+        "id": "1990_6",
+        "title": "Áj lav jú",
+        "artist": "Rapülők",
+        "year": 1992,
+        "youtubeId": "o3ajQCZMgRY"
+    },
+    {
+        "id": "1990_16",
+        "title": "Egy jó asszony mindent megbocsát",
+        "artist": "Zámbó Jimmy",
+        "year": 1991,
+        "youtubeId": "u4JIQhNAYqM"
+    },
+    {
+        "id": "1990_19",
+        "title": "Macarena",
+        "artist": "Los del Río",
+        "year": 1993,
+        "youtubeId": "2zvd1JQ0EKY"
+    },
+    {
+        "id": "1990_24",
+        "title": "Hol volt hol nem volt",
+        "artist": "Quimby",
+        "year": 1996,
+        "youtubeId": "gLj0GM4jL3w"
+    },
+    {
+        "id": "1990_25",
+        "title": "Don't Speak",
+        "artist": "No Doubt",
+        "year": 1996,
+        "youtubeId": "CkhmpC5SVmU"
+    },
+    {
+        "id": "1990_27",
+        "title": "Under the Bridge",
+        "artist": "Red Hot Chili Peppers",
+        "year": 1991,
+        "youtubeId": "8-tcdMwKnpQ"
+    },
+    {
+        "id": "1990_36",
+        "title": "Megdöglöm érted",
+        "artist": "FLM",
+        "year": 1997,
+        "youtubeId": "aSrl1THXomI"
+    },
+    {
+        "id": "1990_46",
+        "title": "New York, New York",
+        "artist": "Tátrai Band",
+        "year": 1991,
+        "youtubeId": "mi8bVu9t_sA"
+    },
+    {
+        "id": "1990_56",
+        "title": "Szabó János",
+        "artist": "Pa-dö-dö",
+        "year": 1992,
+        "youtubeId": "dOnxcXifvVM"
+    },
+    {
+        "id": "1990_57",
+        "title": "California Love",
+        "artist": "2Pac",
+        "year": 1995,
+        "youtubeId": "RVuLwqdOPlo"
+    },
+    {
+        "id": "1990_58",
+        "title": "Kismalac",
+        "artist": "Kerozin",
+        "year": 1998,
+        "youtubeId": "E52N8iYIYfw"
+    },
+    {
+        "id": "1990_66",
+        "title": "Gyémánt",
+        "artist": "Kimnowak",
+        "year": 1994,
+        "youtubeId": "75MGm_8FHcY"
+    },
+    {
+        "id": "1990_72",
+        "title": "Kockahas",
+        "artist": "Venus",
+        "year": 1999,
+        "youtubeId": "yO2c1WkqVzc"
+    },
+    {
+        "id": "2000_4",
+        "title": "Hajnal",
+        "artist": "Groovehouse",
+        "year": 2001,
+        "youtubeId": "vJtEzEb_tCI"
+    },
+    {
+        "id": "2000_6",
+        "title": "Örökké tart",
+        "artist": "Tankcsapda",
+        "year": 2003,
+        "youtubeId": "gDevCxVY_wA"
+    },
+    {
+        "id": "2000_7",
+        "title": "Crazy In Love",
+        "artist": "Beyoncé",
+        "year": 2003,
+        "youtubeId": "ViwtNLUqkMY"
+    },
+    {
+        "id": "2000_10",
+        "title": "Most múlik pontosan",
+        "artist": "Quimby",
+        "year": 2005,
+        "youtubeId": "bbF7VVsKYIw"
+    },
+    {
+        "id": "2000_11",
+        "title": "Mr. Brightside",
+        "artist": "The Killers",
+        "year": 2003,
+        "youtubeId": "j8tZs6G_h7U"
+    },
+    {
+        "id": "2000_18",
+        "title": "Táncolj",
+        "artist": "Desperado",
+        "year": 2001,
+        "youtubeId": "B_fVdBCwTY8"
+    },
+    {
+        "id": "2000_26",
+        "title": "Zsolti a béka",
+        "artist": "Bëlga",
+        "year": 2005,
+        "youtubeId": "4GFe8c9F0Iw"
+    },
+    {
+        "id": "2000_36",
+        "title": "Szalai Éva",
+        "artist": "Kaukázus",
+        "year": 2006,
+        "youtubeId": "3Kp5ggaqjp4"
+    },
+    {
+        "id": "2000_42",
+        "title": "Bogozd ki",
+        "artist": "30Y",
+        "year": 2006,
+        "youtubeId": "WEF92uBLFdk"
+    },
+    {
+        "id": "2000_46",
+        "title": "Hol van az a krézi srác",
+        "artist": "Heaven Street Seven",
+        "year": 2000,
+        "youtubeId": "RPEEy8_Cqaw"
+    },
+    {
+        "id": "2000_51",
+        "title": "Nélküled",
+        "artist": "Ismerős Arcok",
+        "year": 2007,
+        "youtubeId": "o-vsRrcDFC8"
+    },
+    {
+        "id": "2010_2",
+        "title": "Belehalok",
+        "artist": "Majka ft. Curtis, BLR",
+        "year": 2012,
+        "youtubeId": "UylZ_e2mAFk"
+    },
+    {
+        "id": "2010_6",
+        "title": "Rakpart",
+        "artist": "Wellhello",
+        "year": 2014,
+        "youtubeId": "HUp0WTVi55Y"
+    },
+    {
+        "id": "2010_14",
+        "title": "Nem tudja senki",
+        "artist": "Follow The Flow",
+        "year": 2018,
+        "youtubeId": "lLZ-sHGcgjo"
+    },
+    {
+        "id": "2010_16",
+        "title": "Kedvesem",
+        "artist": "ByeAlex",
+        "year": 2013,
+        "youtubeId": "t_qdiusfkp0"
+    },
+    {
+        "id": "2010_26",
+        "title": "Lélekdonor",
+        "artist": "Caramel",
+        "year": 2010,
+        "youtubeId": "HYCzzZF70Ys"
+    },
+    {
+        "id": "2010_28",
+        "title": "Sound of Our Hearts",
+        "artist": "Compact Disco",
+        "year": 2012,
+        "youtubeId": "qVXhElLlWb8"
+    },
+    {
+        "id": "2010_30",
+        "title": "Hajnali kör",
+        "artist": "Irie Maffia",
+        "year": 2015,
+        "youtubeId": "In1JOnUVmMc"
+    },
+    {
+        "id": "2010_36",
+        "title": "Illúzió",
+        "artist": "Hooligans",
+        "year": 2010,
+        "youtubeId": "YEXGE8OfgqM"
+    },
+    {
+        "id": "2010_38",
+        "title": "Pioneer",
+        "artist": "Freddie",
+        "year": 2016,
+        "youtubeId": "AMNcDQENT6o"
+    },
+    {
+        "id": "2010_50",
+        "title": "Mizu",
+        "artist": "Fluor",
+        "year": 2011,
+        "youtubeId": "t8ll4k0E6qc"
+    },
+    {
+        "id": "2020_4",
+        "title": "Mind1",
+        "artist": "Azahriah x DESH",
+        "year": 2021,
+        "youtubeId": "Mfy0OweIo3w"
+    },
+    {
+        "id": "2020_5",
+        "title": "Save Your Tears",
+        "artist": "The Weeknd",
+        "year": 2020,
+        "youtubeId": "XXYlFuWEuKI"
+    },
+    {
+        "id": "2020_6",
+        "title": "Lej",
+        "artist": "Dzsúdló",
+        "year": 2020,
+        "youtubeId": "HarFaDxCoxE"
+    },
+    {
+        "id": "2020_9",
+        "title": "Bad Habits",
+        "artist": "Ed Sheeran",
+        "year": 2021,
+        "youtubeId": "orJSJGHjBLI"
+    },
+    {
+        "id": "2020_12",
+        "title": "Visszajövök",
+        "artist": "Bagossy Brothers Company",
+        "year": 2020,
+        "youtubeId": "Qjmj9aNqgG8"
+    },
+    {
+        "id": "2020_14",
+        "title": "Tavasz",
+        "artist": "Follow The Flow",
+        "year": 2020,
+        "youtubeId": "4-MyG9_8VAg"
+    },
+    {
+        "id": "2020_15",
+        "title": "Heat Waves",
+        "artist": "Glass Animals",
+        "year": 2020,
+        "youtubeId": "rfTgO9rpqck"
+    },
+    {
+        "id": "2020_16",
+        "title": "Zombi",
+        "artist": "Manuel",
+        "year": 2022,
+        "youtubeId": "QO-zDh1s6VA"
+    },
+    {
+        "id": "2020_22",
+        "title": "Keverem",
+        "artist": "Bruno x Spacc",
+        "year": 2020,
+        "youtubeId": "Xjl4HmQUsyk"
+    },
+    {
+        "id": "2020_26",
+        "title": "Berúgni",
+        "artist": "ByeAlex és a Slepp",
+        "year": 2021,
+        "youtubeId": "zErtWiz5tcc"
+    },
+    {
+        "id": "2020_32",
+        "title": "Csavargó",
+        "artist": "KKevin",
+        "year": 2023,
+        "youtubeId": "kX4xwDmtay4"
+    },
+    {
+        "id": "2020_34",
+        "title": "Csak Te",
+        "artist": "T. Danny",
+        "year": 2022,
+        "youtubeId": "bDTqLpx_hdU"
+    },
+    {
+        "id": "2020_36",
+        "title": "Yaay",
+        "artist": "BSW",
+        "year": 2020,
+        "youtubeId": "zgtBk2IOOrA"
+    },
+    {
+        "id": "2020_38",
+        "title": "Pullup",
+        "artist": "Azahriah x DESH",
+        "year": 2022,
+        "youtubeId": "5pXMh3KQK6Q"
+    },
+    {
+        "id": "2020_40",
+        "title": "Bárhová",
+        "artist": "Wellhello",
+        "year": 2020,
+        "youtubeId": "NifWaAaXcb8"
+    },
+    {
+        "id": "2020_43",
+        "title": "Therefore I Am",
+        "artist": "Billie Eilish",
+        "year": 2020,
+        "youtubeId": "RUQl6YcMalg"
+    },
+    {
+        "id": "2020_46",
+        "title": "Mese",
+        "artist": "G.w.M",
+        "year": 2021,
+        "youtubeId": "hKNxo2pymP8"
+    },
+    {
         "id": "1",
         "title": "In The Mood",
         "artist": "Glenn Miller",
@@ -16,25 +681,11 @@ export const MUSIC_LIBRARY: ICard[] = [
         "youtubeId": "P2hrt6INi_w"
     },
     {
-        "id": "3",
-        "title": "White Christmas",
-        "artist": "Bing Crosby",
-        "year": 1942,
-        "youtubeId": "w9QLn7gM-hY"
-    },
-    {
         "id": "4",
         "title": "Nem wurlitzer a vurstliban",
         "artist": "Tolnay Klári",
         "year": 1942,
         "youtubeId": "eDjUdCXAIqA"
-    },
-    {
-        "id": "5",
-        "title": "Boogie Woogie Bugle Boy",
-        "artist": "The Andrews Sisters",
-        "year": 1941,
-        "youtubeId": "qafnJ6mRbgk"
     },
     {
         "id": "1950_1",
@@ -51,13 +702,6 @@ export const MUSIC_LIBRARY: ICard[] = [
         "youtubeId": "tGAzU2NFWoE"
     },
     {
-        "id": "1950_3",
-        "title": "Jailhouse Rock",
-        "artist": "Elvis Presley",
-        "year": 1957,
-        "youtubeId": "gj0R5cgOqhU"
-    },
-    {
         "id": "1950_4",
         "title": "Megáll az idő",
         "artist": "Hollós Ilona",
@@ -65,25 +709,11 @@ export const MUSIC_LIBRARY: ICard[] = [
         "youtubeId": "EI-FrzM7gT4"
     },
     {
-        "id": "1950_5",
-        "title": "Johnny B. Goode",
-        "artist": "Chuck Berry",
-        "year": 1958,
-        "youtubeId": "T38v3-SSGcM"
-    },
-    {
         "id": "1950_6",
         "title": "Régi óra halkan jár",
         "artist": "Kovács Erzsi",
         "year": 1955,
         "youtubeId": "Mvm0cEqKkyY"
-    },
-    {
-        "id": "1950_7",
-        "title": "Tutti Frutti",
-        "artist": "Little Richard",
-        "year": 1955,
-        "youtubeId": "LVIttmFAzek"
     },
     {
         "id": "1950_8",
@@ -107,13 +737,6 @@ export const MUSIC_LIBRARY: ICard[] = [
         "youtubeId": "VBtzsW8v444"
     },
     {
-        "id": "1950_11",
-        "title": "Great Balls of Fire",
-        "artist": "Jerry Lee Lewis",
-        "year": 1957,
-        "youtubeId": "0VJ1NuAbEBI"
-    },
-    {
         "id": "1950_12",
         "title": "Nekem a Balaton a riviéra",
         "artist": "Németh Lehel",
@@ -135,18 +758,11 @@ export const MUSIC_LIBRARY: ICard[] = [
         "youtubeId": "INWZKnxuT_0"
     },
     {
-        "id": "1950_15",
-        "title": "What'd I Say",
-        "artist": "Ray Charles",
-        "year": 1959,
-        "youtubeId": "HAzeXTG1MQs"
-    },
-    {
         "id": "1950_16",
         "title": "Csinibaba",
         "artist": "Vámosi János",
         "year": 1958,
-        "youtubeId": "J5aQ4d1f2gH"
+        "youtubeId": "AbgSANgugz4"
     },
     {
         "id": "1950_17",
@@ -161,13 +777,6 @@ export const MUSIC_LIBRARY: ICard[] = [
         "artist": "Kazal László",
         "year": 1955,
         "youtubeId": "81blUJ4A1B8"
-    },
-    {
-        "id": "1950_19",
-        "title": "La Bamba",
-        "artist": "Ritchie Valens",
-        "year": 1958,
-        "youtubeId": "jSKJQ18ZoCE"
     },
     {
         "id": "1950_20",
@@ -191,13 +800,6 @@ export const MUSIC_LIBRARY: ICard[] = [
         "youtubeId": "tx3Ex2aYvIs"
     },
     {
-        "id": "1950_23",
-        "title": "Singin' in the Rain",
-        "artist": "Gene Kelly",
-        "year": 1952,
-        "youtubeId": "D1ZYhVpdXbQ"
-    },
-    {
         "id": "1950_24",
         "title": "Ahogy lesz, úgy lesz",
         "artist": "Hollós Ilona",
@@ -205,25 +807,11 @@ export const MUSIC_LIBRARY: ICard[] = [
         "youtubeId": "tGvEFnVyItg"
     },
     {
-        "id": "1950_25",
-        "title": "Peggy Sue",
-        "artist": "Buddy Holly",
-        "year": 1957,
-        "youtubeId": "QY5nJ6mRbgk"
-    },
-    {
         "id": "1950_26",
         "title": "Kétszer kettő néha öt",
         "artist": "Vámosi János",
         "year": 1954,
-        "youtubeId": "W5_z4g5m6yY"
-    },
-    {
-        "id": "1950_27",
-        "title": "Tequila",
-        "artist": "The Champs",
-        "year": 1958,
-        "youtubeId": "Uylcg1TgH_A"
+        "youtubeId": "DVmXvN1ovVM"
     },
     {
         "id": "1950_28",
@@ -231,13 +819,6 @@ export const MUSIC_LIBRARY: ICard[] = [
         "artist": "Kovács Erzsi",
         "year": 1958,
         "youtubeId": "1QNog0fKsLU"
-    },
-    {
-        "id": "1950_29",
-        "title": "Put Your Head on My Shoulder",
-        "artist": "Paul Anka",
-        "year": 1959,
-        "youtubeId": "uvxagNIBVkk"
     },
     {
         "id": "1950_30",
@@ -303,13 +884,6 @@ export const MUSIC_LIBRARY: ICard[] = [
         "youtubeId": "bkgn5tGg5vc"
     },
     {
-        "id": "1960_9",
-        "title": "Like a Rolling Stone",
-        "artist": "Bob Dylan",
-        "year": 1965,
-        "youtubeId": "IwOfCgkyIG0"
-    },
-    {
         "id": "1960_10",
         "title": "Csavard fel a szőnyeget",
         "artist": "Hungária",
@@ -322,20 +896,6 @@ export const MUSIC_LIBRARY: ICard[] = [
         "artist": "The Beach Boys",
         "year": 1966,
         "youtubeId": "jkPyB-g3asI"
-    },
-    {
-        "id": "1960_12",
-        "title": "Rohan az idő",
-        "artist": "Koncz Zsuzsa",
-        "year": 1966,
-        "youtubeId": "xP8lF4h9B2M"
-    },
-    {
-        "id": "1960_13",
-        "title": "House of the Rising Sun",
-        "artist": "The Animals",
-        "year": 1964,
-        "youtubeId": "4-43lLhdIQ15"
     },
     {
         "id": "1960_14",
@@ -356,14 +916,7 @@ export const MUSIC_LIBRARY: ICard[] = [
         "title": "Kislány a zongoránál",
         "artist": "Koós János",
         "year": 1968,
-        "youtubeId": "m8V3bZ6c2L4"
-    },
-    {
-        "id": "1960_17",
-        "title": "The Sound of Silence",
-        "artist": "Simon & Garfunkel",
-        "year": 1964,
-        "youtubeId": "4fWyzwo1xg0"
+        "youtubeId": "IfKmKtC2H4c"
     },
     {
         "id": "1960_18",
@@ -401,13 +954,6 @@ export const MUSIC_LIBRARY: ICard[] = [
         "youtubeId": "4szfWQ7Sspg"
     },
     {
-        "id": "1960_23",
-        "title": "Ring of Fire",
-        "artist": "Johnny Cash",
-        "year": 1963,
-        "youtubeId": "1zrNdcmSmc8"
-    },
-    {
         "id": "1960_24",
         "title": "Citromízű banán",
         "artist": "Metro",
@@ -441,13 +987,6 @@ export const MUSIC_LIBRARY: ICard[] = [
         "artist": "Poór Péter",
         "year": 1967,
         "youtubeId": "mXpMxsviGgQ"
-    },
-    {
-        "id": "1960_29",
-        "title": "I Heard It Through The Grapevine",
-        "artist": "Marvin Gaye",
-        "year": 1968,
-        "youtubeId": "hajBdCG2qiw"
     },
     {
         "id": "1960_30",
@@ -506,13 +1045,6 @@ export const MUSIC_LIBRARY: ICard[] = [
         "youtubeId": "qQzdAsjWGPg"
     },
     {
-        "id": "1960_38",
-        "title": "Ilyen a természetem",
-        "artist": "Ambrus Kyri",
-        "year": 1966,
-        "youtubeId": "78OmM93LKN"
-    },
-    {
         "id": "1960_39",
         "title": "You Really Got Me",
         "artist": "The Kinks",
@@ -525,13 +1057,6 @@ export const MUSIC_LIBRARY: ICard[] = [
         "artist": "Illés",
         "year": 1968,
         "youtubeId": "at8NQGMAggY"
-    },
-    {
-        "id": "1960_41",
-        "title": "Fekete Vonat",
-        "artist": "Poór Péter",
-        "year": 1966,
-        "youtubeId": "29OB0_yez6Q"
     },
     {
         "id": "1970_1",
@@ -573,14 +1098,14 @@ export const MUSIC_LIBRARY: ICard[] = [
         "title": "Szállj fel magasra",
         "artist": "Piramis",
         "year": 1977,
-        "youtubeId": "v8B5k3_Mv9A"
+        "youtubeId": "XGY7_HtZiQA"
     },
     {
         "id": "1970_7",
         "title": "Another Brick in the Wall, Part 2",
         "artist": "Pink Floyd",
         "year": 1979,
-        "youtubeId": "YR5ApYxkU-U"
+        "youtubeId": "HrxX9TBj2zY"
     },
     {
         "id": "1970_8",
@@ -618,13 +1143,6 @@ export const MUSIC_LIBRARY: ICard[] = [
         "youtubeId": "MFZuJqIkuO0"
     },
     {
-        "id": "1970_13",
-        "title": "I Will Survive",
-        "artist": "Gloria Gaynor",
-        "year": 1978,
-        "youtubeId": "ARt9HV9T0w8"
-    },
-    {
         "id": "1970_14",
         "title": "Lökd ide a sört",
         "artist": "Fonográf",
@@ -643,21 +1161,7 @@ export const MUSIC_LIBRARY: ICard[] = [
         "title": "Édes kisfiam",
         "artist": "Cserháti Zsuzsa",
         "year": 1979,
-        "youtubeId": "x4c8Vj3D1bP"
-    },
-    {
-        "id": "1970_17",
-        "title": "Daddy Cool",
-        "artist": "Boney M.",
-        "year": 1976,
-        "youtubeId": "QtxlCsVKkvY"
-    },
-    {
-        "id": "1970_18",
-        "title": "Valahol egy lány",
-        "artist": "Koncz Zsuzsa",
-        "year": 1971,
-        "youtubeId": "LPsegzhgBc"
+        "youtubeId": "5yGcttGPMiI"
     },
     {
         "id": "1970_19",
@@ -734,7 +1238,7 @@ export const MUSIC_LIBRARY: ICard[] = [
         "title": "Starman",
         "artist": "David Bowie",
         "year": 1972,
-        "youtubeId": "sI66hcu9fIs"
+        "youtubeId": "t365MuktYQs"
     },
     {
         "id": "1970_30",
@@ -751,13 +1255,6 @@ export const MUSIC_LIBRARY: ICard[] = [
         "youtubeId": "4G-YQA_bsOU"
     },
     {
-        "id": "1970_32",
-        "title": "Apám hitte",
-        "artist": "Sztevanovity Zorán",
-        "year": 1977,
-        "youtubeId": "Kz1L3uS9m8Q"
-    },
-    {
         "id": "1970_33",
         "title": "Brown Sugar",
         "artist": "The Rolling Stones",
@@ -770,20 +1267,6 @@ export const MUSIC_LIBRARY: ICard[] = [
         "artist": "Demjén Ferenc",
         "year": 1977,
         "youtubeId": "XRj3vAV5f2E"
-    },
-    {
-        "id": "1970_35",
-        "title": "No Woman, No Cry",
-        "artist": "Bob Marley",
-        "year": 1974,
-        "youtubeId": "IT8XvZclSQk"
-    },
-    {
-        "id": "1970_36",
-        "title": "Táncolj még!",
-        "artist": "Szűcs Judith",
-        "year": 1978,
-        "youtubeId": "L2rB7v3_KxP"
     },
     {
         "id": "1970_37",
@@ -849,13 +1332,6 @@ export const MUSIC_LIBRARY: ICard[] = [
         "youtubeId": "EfK-WX2pa8c"
     },
     {
-        "id": "1970_46",
-        "title": "Léna",
-        "artist": "Omega",
-        "year": 1978,
-        "youtubeId": "Kz1L3uS9m8W"
-    },
-    {
         "id": "1970_47",
         "title": "I Was Made For Lovin' You",
         "artist": "KISS",
@@ -868,13 +1344,6 @@ export const MUSIC_LIBRARY: ICard[] = [
         "artist": "Beatrice",
         "year": 1979,
         "youtubeId": "jvbnrlBI1ME"
-    },
-    {
-        "id": "1970_49",
-        "title": "Dream On",
-        "artist": "Aerosmith",
-        "year": 1973,
-        "youtubeId": "89dGC8de0pz"
     },
     {
         "id": "1970_50",
@@ -891,32 +1360,11 @@ export const MUSIC_LIBRARY: ICard[] = [
         "youtubeId": "Sj_9CiNkkn4"
     },
     {
-        "id": "1970_52",
-        "title": "Thank you for the music",
-        "artist": "ABBA",
-        "year": 1977,
-        "youtubeId": "0dcbw4IEY5w"
-    },
-    {
-        "id": "1970_19",
-        "title": "I'm still standing",
-        "artist": "Elton John",
-        "year": 1970,
-        "youtubeId": "MJ_aPtt4U8M"
-    },
-    {
         "id": "1980_1",
         "title": "Billie Jean",
         "artist": "Michael Jackson",
         "year": 1982,
         "youtubeId": "Zi_XLOBDo_Y"
-    },
-    {
-        "id": "1980_2",
-        "title": "Afrika",
-        "artist": "KFT",
-        "year": 1984,
-        "youtubeId": "Kz9V8bL3mP4"
     },
     {
         "id": "1980_3",
@@ -961,13 +1409,6 @@ export const MUSIC_LIBRARY: ICard[] = [
         "youtubeId": "OR-zjGr9Gnw"
     },
     {
-        "id": "1980_9",
-        "title": "Every Breath You Take",
-        "artist": "The Police",
-        "year": 1983,
-        "youtubeId": "OMAPtPlbIEY"
-    },
-    {
         "id": "1980_10",
         "title": "Vakáció",
         "artist": "Dolly Roll",
@@ -989,25 +1430,11 @@ export const MUSIC_LIBRARY: ICard[] = [
         "youtubeId": "V6-ZAruDK6g"
     },
     {
-        "id": "1980_13",
-        "title": "Sweet Dreams (Are Made of This)",
-        "artist": "Eurythmics",
-        "year": 1983,
-        "youtubeId": "qeMFqKcQ9Oo"
-    },
-    {
         "id": "1980_14",
         "title": "Csakazértis szerelem",
         "artist": "Első Emelet",
         "year": 1987,
         "youtubeId": "6XBuqTeUAc0"
-    },
-    {
-        "id": "1980_15",
-        "title": "Livin' On A Prayer",
-        "artist": "Bon Jovi",
-        "year": 1986,
-        "youtubeId": "lDK9QqIzhwk"
     },
     {
         "id": "1980_16",
@@ -1042,14 +1469,7 @@ export const MUSIC_LIBRARY: ICard[] = [
         "title": "Szeretlek is meg nem is",
         "artist": "R-GO",
         "year": 1985,
-        "youtubeId": "v8B5k3_Mv9P"
-    },
-    {
-        "id": "1980_21",
-        "title": "Never Gonna Give You Up",
-        "artist": "Rick Astley",
-        "year": 1987,
-        "youtubeId": "dQw4w9WgXcQ"
+        "youtubeId": "O3WJwT4XjqU"
     },
     {
         "id": "1980_22",
@@ -1080,13 +1500,6 @@ export const MUSIC_LIBRARY: ICard[] = [
         "youtubeId": "1w7OgIMMRc4"
     },
     {
-        "id": "1980_26",
-        "title": "Júlia nem akar a földön járni",
-        "artist": "Napoleon Boulevard",
-        "year": 1988,
-        "youtubeId": "RIEqVfah2Q"
-    },
-    {
         "id": "1980_27",
         "title": "With Or Without You",
         "artist": "U2",
@@ -1099,20 +1512,6 @@ export const MUSIC_LIBRARY: ICard[] = [
         "artist": "Zoltán Erika",
         "year": 1986,
         "youtubeId": "qZp4jMQOyoI"
-    },
-    {
-        "id": "1980_29",
-        "title": "Dancing In the Dark",
-        "artist": "Bruce Springsteen",
-        "year": 1984,
-        "youtubeId": "129kuCQboyI"
-    },
-    {
-        "id": "1980_30",
-        "title": "Kopaszkutya",
-        "artist": "Hobo Blues Band",
-        "year": 1981,
-        "youtubeId": "x4c8Vj3D1bA"
     },
     {
         "id": "1980_31",
@@ -1129,32 +1528,11 @@ export const MUSIC_LIBRARY: ICard[] = [
         "youtubeId": "uZ8y1Dst8Is"
     },
     {
-        "id": "1980_33",
-        "title": "Total Eclipse of the Heart",
-        "artist": "Bonnie Tyler",
-        "year": 1983,
-        "youtubeId": "lcOxhH8N3Bo"
-    },
-    {
-        "id": "1980_34",
-        "title": "Requiem",
-        "artist": "Karthago",
-        "year": 1981,
-        "youtubeId": "v8B5k3_Mv9Q"
-    },
-    {
         "id": "1980_35",
         "title": "Africa",
         "artist": "Toto",
         "year": 1982,
         "youtubeId": "FTQbiNvZqaY"
-    },
-    {
-        "id": "1980_36",
-        "title": "Európa",
-        "artist": "Varga Miklós",
-        "year": 1984,
-        "youtubeId": "L2rB7v3_KxP"
     },
     {
         "id": "1980_37",
@@ -1220,32 +1598,18 @@ export const MUSIC_LIBRARY: ICard[] = [
         "youtubeId": "9f06QZCVUHg"
     },
     {
-        "id": "1980_46",
-        "title": "Álmodtam egy világot magamnak",
-        "artist": "Edda Művek",
-        "year": 1980,
-        "youtubeId": "Kz1L3uS9m8W"
-    },
-    {
         "id": "1980_47",
         "title": "Back In Black",
         "artist": "AC/DC",
         "year": 1980,
-        "youtubeId": "pAgnJENB4L4"
-    },
-    {
-        "id": "1980_48",
-        "title": "Zenevonat",
-        "artist": "LGT",
-        "year": 1982,
-        "youtubeId": "v8B5k3_Mv9W"
+        "youtubeId": "pAgnJDJN4VA"
     },
     {
         "id": "1980_49",
         "title": "I Love Rock 'N Roll",
         "artist": "Joan Jett & the Blackhearts",
         "year": 1981,
-        "youtubeId": "iC8oP4Z_xPU"
+        "youtubeId": "oKuBHSWdV8I"
     },
     {
         "id": "1980_50",
@@ -1297,13 +1661,6 @@ export const MUSIC_LIBRARY: ICard[] = [
         "youtubeId": "9LdoDDOFKu4"
     },
     {
-        "id": "1980_57",
-        "title": "Everybody Wants To Rule The World",
-        "artist": "Tears For Fears",
-        "year": 1985,
-        "youtubeId": "aGcO41YIGvw"
-    },
-    {
         "id": "1980_58",
         "title": "Létezem",
         "artist": "R-GO",
@@ -1346,13 +1703,6 @@ export const MUSIC_LIBRARY: ICard[] = [
         "youtubeId": "2LkUu85JLAc"
     },
     {
-        "id": "1990_3",
-        "title": "...Baby One More Time",
-        "artist": "Britney Spears",
-        "year": 1998,
-        "youtubeId": "C-u5WLJ9Yk4"
-    },
-    {
         "id": "1990_4",
         "title": "Ilyenek voltunk",
         "artist": "Ákos",
@@ -1365,13 +1715,6 @@ export const MUSIC_LIBRARY: ICard[] = [
         "artist": "Backstreet Boys",
         "year": 1999,
         "youtubeId": "4fndeDfaWCg"
-    },
-    {
-        "id": "1990_6",
-        "title": "Áj lav jú",
-        "artist": "Rapülők",
-        "year": 1992,
-        "youtubeId": "qQ5a18xJk4H"
     },
     {
         "id": "1990_7",
@@ -1437,13 +1780,6 @@ export const MUSIC_LIBRARY: ICard[] = [
         "youtubeId": "otCpCn0l4Wo"
     },
     {
-        "id": "1990_16",
-        "title": "Egy jó asszony mindent megbocsát",
-        "artist": "Zámbó Jimmy",
-        "year": 1991,
-        "youtubeId": "v8B5k3_Mv9N"
-    },
-    {
         "id": "1990_17",
         "title": "Ice Ice Baby",
         "artist": "Vanilla Ice",
@@ -1456,13 +1792,6 @@ export const MUSIC_LIBRARY: ICard[] = [
         "artist": "TNT",
         "year": 1997,
         "youtubeId": "j3198VyyQyA"
-    },
-    {
-        "id": "1990_19",
-        "title": "Macarena",
-        "artist": "Los del Río",
-        "year": 1993,
-        "youtubeId": "zWaymcVmJ-A"
     },
     {
         "id": "1990_20",
@@ -1493,32 +1822,11 @@ export const MUSIC_LIBRARY: ICard[] = [
         "youtubeId": "8WEtxJ4-sh4"
     },
     {
-        "id": "1990_24",
-        "title": "Hol volt hol nem volt",
-        "artist": "Quimby",
-        "year": 1996,
-        "youtubeId": "Uylcg1TgH_J"
-    },
-    {
-        "id": "1990_25",
-        "title": "Don't Speak",
-        "artist": "No Doubt",
-        "year": 1996,
-        "youtubeId": "TR3Vdo5etCQ"
-    },
-    {
         "id": "1990_26",
         "title": "Hamu és gyémánt",
         "artist": "Cserháti Zsuzsa",
         "year": 1996,
-        "youtubeId": "x4c8Vj3D1bZ"
-    },
-    {
-        "id": "1990_27",
-        "title": "Under the Bridge",
-        "artist": "Red Hot Chili Peppers",
-        "year": 1991,
-        "youtubeId": "lwlogyj7nFE"
+        "youtubeId": "7rNhlpXpJ9Y"
     },
     {
         "id": "1990_28",
@@ -1575,13 +1883,6 @@ export const MUSIC_LIBRARY: ICard[] = [
         "artist": "Radiohead",
         "year": 1992,
         "youtubeId": "XFkzRNyygfk"
-    },
-    {
-        "id": "1990_36",
-        "title": "Megdöglöm érted",
-        "artist": "FLM",
-        "year": 1997,
-        "youtubeId": "W5_z4g5m6yB"
     },
     {
         "id": "1990_37",
@@ -1647,13 +1948,6 @@ export const MUSIC_LIBRARY: ICard[] = [
         "youtubeId": "nZXRV4MezEw"
     },
     {
-        "id": "1990_46",
-        "title": "New York, New York",
-        "artist": "Tátrai Band",
-        "year": 1991,
-        "youtubeId": "L2rB7v3_KxF"
-    },
-    {
         "id": "1990_47",
         "title": "Say My Name",
         "artist": "Destiny's Child",
@@ -1707,7 +2001,7 @@ export const MUSIC_LIBRARY: ICard[] = [
         "title": "Szeresd a testem",
         "artist": "Baby Sisters",
         "year": 1997,
-        "youtubeId": "x4c8Vj3D1bL"
+        "youtubeId": "9j07O37yNxo"
     },
     {
         "id": "1990_55",
@@ -1715,27 +2009,6 @@ export const MUSIC_LIBRARY: ICard[] = [
         "artist": "Bryan Adams",
         "year": 1991,
         "youtubeId": "Y0pdQU87dc8"
-    },
-    {
-        "id": "1990_56",
-        "title": "Szabó János",
-        "artist": "Pa-dö-dö",
-        "year": 1992,
-        "youtubeId": "Kz1L3uS9m8A"
-    },
-    {
-        "id": "1990_57",
-        "title": "California Love",
-        "artist": "2Pac",
-        "year": 1995,
-        "youtubeId": "FWOsbWs5nF8"
-    },
-    {
-        "id": "1990_58",
-        "title": "Kismalac",
-        "artist": "Kerozin",
-        "year": 1998,
-        "youtubeId": "v8B5k3_Mv9J"
     },
     {
         "id": "1990_59",
@@ -1787,13 +2060,6 @@ export const MUSIC_LIBRARY: ICard[] = [
         "youtubeId": "qM0zINtulhM"
     },
     {
-        "id": "1990_66",
-        "title": "Gyémánt",
-        "artist": "Kimnowak",
-        "year": 1994,
-        "youtubeId": "Uylcg1TgH_P"
-    },
-    {
         "id": "1990_67",
         "title": "Back for Good",
         "artist": "Take That",
@@ -1805,7 +2071,7 @@ export const MUSIC_LIBRARY: ICard[] = [
         "title": "Ha lemegy a nap",
         "artist": "Orsi",
         "year": 1997,
-        "youtubeId": "x4c8Vj3D1bU"
+        "youtubeId": "JwvhlkXpUAM"
     },
     {
         "id": "1990_69",
@@ -1827,13 +2093,6 @@ export const MUSIC_LIBRARY: ICard[] = [
         "artist": "The Verve",
         "year": 1997,
         "youtubeId": "1lyu1KKwC74"
-    },
-    {
-        "id": "1990_72",
-        "title": "Kockahas",
-        "artist": "Venus",
-        "year": 1999,
-        "youtubeId": "v8B5k3_Mv9D"
     },
     {
         "id": "1990_73",
@@ -1878,32 +2137,11 @@ export const MUSIC_LIBRARY: ICard[] = [
         "youtubeId": "PWgvGjAhvIw"
     },
     {
-        "id": "2000_4",
-        "title": "Hajnal",
-        "artist": "Groovehouse",
-        "year": 2001,
-        "youtubeId": "W5_z4g5m6yA"
-    },
-    {
         "id": "2000_5",
         "title": "Yellow",
         "artist": "Coldplay",
         "year": 2000,
         "youtubeId": "yKNxeF4KMsY"
-    },
-    {
-        "id": "2000_6",
-        "title": "Örökké tart",
-        "artist": "Tankcsapda",
-        "year": 2003,
-        "youtubeId": "v8B5k3_Mv9B"
-    },
-    {
-        "id": "2000_7",
-        "title": "Crazy In Love",
-        "artist": "Beyoncé",
-        "year": 2003,
-        "youtubeId": "ViwtNLUqkMY"
     },
     {
         "id": "2000_8",
@@ -1920,25 +2158,11 @@ export const MUSIC_LIBRARY: ICard[] = [
         "youtubeId": "CvBfHwUxHIk"
     },
     {
-        "id": "2000_10",
-        "title": "Most múlik pontosan",
-        "artist": "Quimby",
-        "year": 2005,
-        "youtubeId": "bbF7VVsKYIw"
-    },
-    {
-        "id": "2000_11",
-        "title": "Mr. Brightside",
-        "artist": "The Killers",
-        "year": 2003,
-        "youtubeId": "gGdGFtwcwJM"
-    },
-    {
         "id": "2000_12",
         "title": "Motel",
         "artist": "Zséda",
         "year": 2003,
-        "youtubeId": "x4c8Vj3D1bB"
+        "youtubeId": "md4-UssS60U"
     },
     {
         "id": "2000_13",
@@ -1974,13 +2198,6 @@ export const MUSIC_LIBRARY: ICard[] = [
         "artist": "The Black Eyed Peas",
         "year": 2009,
         "youtubeId": "uSD4vsh1zDA"
-    },
-    {
-        "id": "2000_18",
-        "title": "Táncolj",
-        "artist": "Desperado",
-        "year": 2001,
-        "youtubeId": "B_fVdBCwTY8"
     },
     {
         "id": "2000_19",
@@ -2032,13 +2249,6 @@ export const MUSIC_LIBRARY: ICard[] = [
         "youtubeId": "5qm8PH4xAss"
     },
     {
-        "id": "2000_26",
-        "title": "Zsolti a béka",
-        "artist": "Bëlga",
-        "year": 2005,
-        "youtubeId": "x4c8Vj3D1bC"
-    },
-    {
         "id": "2000_27",
         "title": "Toxic",
         "artist": "Britney Spears",
@@ -2057,7 +2267,7 @@ export const MUSIC_LIBRARY: ICard[] = [
         "title": "Fallin'",
         "artist": "Alicia Keys",
         "year": 2001,
-        "youtubeId": "UrdlO4DfJ3p"
+        "youtubeId": "Urdlvw0SSEc"
     },
     {
         "id": "2000_30",
@@ -2102,13 +2312,6 @@ export const MUSIC_LIBRARY: ICard[] = [
         "youtubeId": "DksSPZTZES0"
     },
     {
-        "id": "2000_36",
-        "title": "Szalai Éva",
-        "artist": "Kaukázus",
-        "year": 2006,
-        "youtubeId": "qQ5a18xJk4F"
-    },
-    {
         "id": "2000_37",
         "title": "Since U Been Gone",
         "artist": "Kelly Clarkson",
@@ -2120,7 +2323,7 @@ export const MUSIC_LIBRARY: ICard[] = [
         "title": "Angelina",
         "artist": "Fiesta",
         "year": 2001,
-        "youtubeId": "L2rB7v3_KxE"
+        "youtubeId": "y5FNtVwTfbg"
     },
     {
         "id": "2000_39",
@@ -2144,13 +2347,6 @@ export const MUSIC_LIBRARY: ICard[] = [
         "youtubeId": "5NPBIwQyPWE"
     },
     {
-        "id": "2000_42",
-        "title": "Bogozd ki",
-        "artist": "30Y",
-        "year": 2006,
-        "youtubeId": "Kz1L3uS9m8H"
-    },
-    {
         "id": "2000_43",
         "title": "Bring Me To Life",
         "artist": "Evanescence",
@@ -2170,13 +2366,6 @@ export const MUSIC_LIBRARY: ICard[] = [
         "artist": "Snow Patrol",
         "year": 2006,
         "youtubeId": "GemKqzILV4w"
-    },
-    {
-        "id": "2000_46",
-        "title": "Hol van az a krézi srác",
-        "artist": "Heaven Street Seven",
-        "year": 2000,
-        "youtubeId": "W5_z4g5m6yE"
     },
     {
         "id": "2000_47",
@@ -2207,13 +2396,6 @@ export const MUSIC_LIBRARY: ICard[] = [
         "youtubeId": "g3WrTsg0IQM"
     },
     {
-        "id": "2000_51",
-        "title": "Nélküled",
-        "artist": "Ismerős Arcok",
-        "year": 2007,
-        "youtubeId": "KmUMvShEq"
-    },
-    {
         "id": "2000_52",
         "title": "Valami Amerika",
         "artist": "Bon Bon",
@@ -2242,13 +2424,6 @@ export const MUSIC_LIBRARY: ICard[] = [
         "youtubeId": "JGwWNGJdvx8"
     },
     {
-        "id": "2010_2",
-        "title": "Belehalok",
-        "artist": "Majka ft. Curtis, BLR",
-        "year": 2012,
-        "youtubeId": "X33B05OqF9w"
-    },
-    {
         "id": "2010_3",
         "title": "Rolling in the Deep",
         "artist": "Adele",
@@ -2268,13 +2443,6 @@ export const MUSIC_LIBRARY: ICard[] = [
         "artist": "Luis Fonsi ft. Daddy Yankee",
         "year": 2017,
         "youtubeId": "kJQP7kiw5Fk"
-    },
-    {
-        "id": "2010_6",
-        "title": "Rakpart",
-        "artist": "Wellhello",
-        "year": 2014,
-        "youtubeId": "k7c3G8c9Y3g"
     },
     {
         "id": "2010_7",
@@ -2326,25 +2494,11 @@ export const MUSIC_LIBRARY: ICard[] = [
         "youtubeId": "IcrbM1l_BoI"
     },
     {
-        "id": "2010_14",
-        "title": "Nem tudja senki",
-        "artist": "Follow The Flow",
-        "year": 2018,
-        "youtubeId": "T8Y5aG_6B3Q"
-    },
-    {
         "id": "2010_15",
         "title": "Blinding Lights",
         "artist": "The Weeknd",
         "year": 2019,
         "youtubeId": "4NRXx6U8ABQ"
-    },
-    {
-        "id": "2010_16",
-        "title": "Kedvesem",
-        "artist": "ByeAlex",
-        "year": 2013,
-        "youtubeId": "t_qdiusfkp0"
     },
     {
         "id": "2010_17",
@@ -2410,13 +2564,6 @@ export const MUSIC_LIBRARY: ICard[] = [
         "youtubeId": "fWNaR-rxAic"
     },
     {
-        "id": "2010_26",
-        "title": "Lélekdonor",
-        "artist": "Caramel",
-        "year": 2010,
-        "youtubeId": "HYCzzZF70Ys"
-    },
-    {
         "id": "2010_27",
         "title": "Sunflower",
         "artist": "Post Malone & Swae Lee",
@@ -2424,25 +2571,11 @@ export const MUSIC_LIBRARY: ICard[] = [
         "youtubeId": "ApXoWvfEYVU"
     },
     {
-        "id": "2010_28",
-        "title": "Sound of Our Hearts",
-        "artist": "Compact Disco",
-        "year": 2012,
-        "youtubeId": "x4c8Vj3D1bP"
-    },
-    {
         "id": "2010_29",
         "title": "Old Town Road",
         "artist": "Lil Nas X",
         "year": 2019,
         "youtubeId": "w2Ov5jzm3j8"
-    },
-    {
-        "id": "2010_30",
-        "title": "Hajnali kör",
-        "artist": "Irie Maffia",
-        "year": 2015,
-        "youtubeId": "qQ5a18xJk4c"
     },
     {
         "id": "2010_31",
@@ -2480,25 +2613,11 @@ export const MUSIC_LIBRARY: ICard[] = [
         "youtubeId": "fRh_vgS2dFE"
     },
     {
-        "id": "2010_36",
-        "title": "Illúzió",
-        "artist": "Hooligans",
-        "year": 2010,
-        "youtubeId": "Uylcg1TgH_Z"
-    },
-    {
         "id": "2010_37",
         "title": "Take Me To Church",
         "artist": "Hozier",
         "year": 2013,
         "youtubeId": "PVjiKRfKpPI"
-    },
-    {
-        "id": "2010_38",
-        "title": "Pioneer",
-        "artist": "Freddie",
-        "year": 2016,
-        "youtubeId": "x4c8Vj3D1bA"
     },
     {
         "id": "2010_39",
@@ -2578,13 +2697,6 @@ export const MUSIC_LIBRARY: ICard[] = [
         "youtubeId": "xpVfcZ0ZcFM"
     },
     {
-        "id": "2010_50",
-        "title": "Mizu",
-        "artist": "Fluor",
-        "year": 2011,
-        "youtubeId": "Uylcg1TgH_X"
-    },
-    {
         "id": "2010_51",
         "title": "Ajjajjaj",
         "artist": "Quimby",
@@ -2606,27 +2718,6 @@ export const MUSIC_LIBRARY: ICard[] = [
         "youtubeId": "H5v3kku4y6Q"
     },
     {
-        "id": "2020_4",
-        "title": "Mind1",
-        "artist": "Azahriah x DESH",
-        "year": 2021,
-        "youtubeId": "W5_z4g5m6yY"
-    },
-    {
-        "id": "2020_5",
-        "title": "Save Your Tears",
-        "artist": "The Weeknd",
-        "year": 2020,
-        "youtubeId": "XXYlCGOW19c"
-    },
-    {
-        "id": "2020_6",
-        "title": "Lej",
-        "artist": "Dzsúdló",
-        "year": 2020,
-        "youtubeId": "HarFaDxCoxE"
-    },
-    {
         "id": "2020_7",
         "title": "Levitating",
         "artist": "Dua Lipa",
@@ -2639,13 +2730,6 @@ export const MUSIC_LIBRARY: ICard[] = [
         "artist": "T. Danny",
         "year": 2020,
         "youtubeId": "JU7btMYmm24"
-    },
-    {
-        "id": "2020_9",
-        "title": "Bad Habits",
-        "artist": "Ed Sheeran",
-        "year": 2021,
-        "youtubeId": "orJSJGHjBLI"
     },
     {
         "id": "2020_10",
@@ -2662,39 +2746,11 @@ export const MUSIC_LIBRARY: ICard[] = [
         "youtubeId": "ZmDBbnmKpqQ"
     },
     {
-        "id": "2020_12",
-        "title": "Visszajövök",
-        "artist": "Bagossy Brothers Company",
-        "year": 2020,
-        "youtubeId": "qQ5a18xJk4c"
-    },
-    {
         "id": "2020_13",
         "title": "Stay",
         "artist": "The Kid LAROI, Justin Bieber",
         "year": 2021,
         "youtubeId": "kTJczUoc26U"
-    },
-    {
-        "id": "2020_14",
-        "title": "Tavasz",
-        "artist": "Follow The Flow",
-        "year": 2020,
-        "youtubeId": "Kz1L3uS9m8Q"
-    },
-    {
-        "id": "2020_15",
-        "title": "Heat Waves",
-        "artist": "Glass Animals",
-        "year": 2020,
-        "youtubeId": "mRD0-GxqHHE"
-    },
-    {
-        "id": "2020_16",
-        "title": "Zombi",
-        "artist": "Manuel",
-        "year": 2022,
-        "youtubeId": "v8B5k3_Mv9A"
     },
     {
         "id": "2020_17",
@@ -2732,13 +2788,6 @@ export const MUSIC_LIBRARY: ICard[] = [
         "youtubeId": "Uq9gPaIzbe8"
     },
     {
-        "id": "2020_22",
-        "title": "Keverem",
-        "artist": "Bruno x Spacc",
-        "year": 2020,
-        "youtubeId": "x4c8Vj3D1bA"
-    },
-    {
         "id": "2020_23",
         "title": "Kill Bill",
         "artist": "SZA",
@@ -2751,13 +2800,6 @@ export const MUSIC_LIBRARY: ICard[] = [
         "artist": "Lizzo",
         "year": 2022,
         "youtubeId": "IXXxciRUMzE"
-    },
-    {
-        "id": "2020_26",
-        "title": "Berúgni",
-        "artist": "ByeAlex és a Slepp",
-        "year": 2021,
-        "youtubeId": "qQ5a18xJk4W"
     },
     {
         "id": "2020_27",
@@ -2795,25 +2837,11 @@ export const MUSIC_LIBRARY: ICard[] = [
         "youtubeId": "Oa_RSwwpPaA"
     },
     {
-        "id": "2020_32",
-        "title": "Csavargó",
-        "artist": "KKevin",
-        "year": 2023,
-        "youtubeId": "Uylcg1TgH_X"
-    },
-    {
         "id": "2020_33",
         "title": "Dance The Night",
         "artist": "Dua Lipa",
         "year": 2023,
         "youtubeId": "OiC1rgCPmUQ"
-    },
-    {
-        "id": "2020_34",
-        "title": "Csak Te",
-        "artist": "T. Danny",
-        "year": 2022,
-        "youtubeId": "x4c8Vj3D1bQ"
     },
     {
         "id": "2020_35",
@@ -2823,25 +2851,11 @@ export const MUSIC_LIBRARY: ICard[] = [
         "youtubeId": "tQ0yjYUFKAE"
     },
     {
-        "id": "2020_36",
-        "title": "Yaay",
-        "artist": "BSW",
-        "year": 2020,
-        "youtubeId": "L2rB7v3_KxR"
-    },
-    {
         "id": "2020_37",
         "title": "Paint The Town Red",
         "artist": "Doja Cat",
         "year": 2023,
         "youtubeId": "m4_9TFeMfJE"
-    },
-    {
-        "id": "2020_38",
-        "title": "Pullup",
-        "artist": "Azahriah x DESH",
-        "year": 2022,
-        "youtubeId": "qQ5a18xJk4A"
     },
     {
         "id": "2020_39",
@@ -2851,18 +2865,11 @@ export const MUSIC_LIBRARY: ICard[] = [
         "youtubeId": "To4SWGZkEPk"
     },
     {
-        "id": "2020_40",
-        "title": "Bárhová",
-        "artist": "Wellhello",
-        "year": 2020,
-        "youtubeId": "Kz1L3uS9m8W"
-    },
-    {
         "id": "2020_41",
         "title": "Texas Hold 'Em",
         "artist": "Beyoncé",
         "year": 2024,
-        "youtubeId": "238Z4PeJW9I"
+        "youtubeId": "238Z4YaAr1g"
     },
     {
         "id": "2020_42",
@@ -2870,13 +2877,6 @@ export const MUSIC_LIBRARY: ICard[] = [
         "artist": "Krúbi",
         "year": 2020,
         "youtubeId": "LfWac28hCb4"
-    },
-    {
-        "id": "2020_43",
-        "title": "Therefore I Am",
-        "artist": "Billie Eilish",
-        "year": 2020,
-        "youtubeId": "RUQl6YcMalk"
     },
     {
         "id": "2020_44",
@@ -2891,13 +2891,6 @@ export const MUSIC_LIBRARY: ICard[] = [
         "artist": "Ariana Grande",
         "year": 2020,
         "youtubeId": "tcYodQoapMg"
-    },
-    {
-        "id": "2020_46",
-        "title": "Mese",
-        "artist": "G.w.M",
-        "year": 2021,
-        "youtubeId": "Uylcg1TgH_B"
     },
     {
         "id": "2020_47",

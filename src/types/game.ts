@@ -40,5 +40,4 @@ export interface GameState {
     maxPlayTime: number;
     isTokenPurchase: boolean;
     targetScore: number;
-
 }
