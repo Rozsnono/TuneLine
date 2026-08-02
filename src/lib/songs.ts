@@ -48,7 +48,7 @@ export const MUSIC_LIBRARY: ICard[] = [
         "title": "What'd I Say",
         "artist": "Ray Charles",
         "year": 1959,
-        "youtubeId": "jBYq0AYTj"
+        "youtubeId": "jBYq0AYTj-Y"
     },
     {
         "id": "1950_19",
@@ -139,7 +139,7 @@ export const MUSIC_LIBRARY: ICard[] = [
         "title": "Fekete Vonat",
         "artist": "Poór Péter",
         "year": 1966,
-        "youtubeId": "29OB0_yez6Q"
+        "youtubeId": "KnhhYiZr5cU"
     },
     {
         "id": "1970_13",
@@ -160,7 +160,7 @@ export const MUSIC_LIBRARY: ICard[] = [
         "title": "Valahol egy lány",
         "artist": "Koncz Zsuzsa",
         "year": 1971,
-        "youtubeId": "LPsegzhgBc"
+        "youtubeId": "TNpImWwwRoY"
     },
     {
         "id": "1970_32",
@@ -244,7 +244,7 @@ export const MUSIC_LIBRARY: ICard[] = [
         "title": "Júlia nem akar a földön járni",
         "artist": "Napoleon Boulevard",
         "year": 1988,
-        "youtubeId": "4ugOe7GXhGE"
+        "youtubeId": "-RIEqVfah2Q"
     },
     {
         "id": "1980_29",
@@ -286,7 +286,7 @@ export const MUSIC_LIBRARY: ICard[] = [
         "title": "Álmodtam egy világot magamnak",
         "artist": "Edda Művek",
         "year": 1980,
-        "youtubeId": "ekked3K6Byo"
+        "youtubeId": "QIWu2-A1zNU"
     },
     {
         "id": "1980_48",
@@ -321,7 +321,7 @@ export const MUSIC_LIBRARY: ICard[] = [
         "title": "Egy jó asszony mindent megbocsát",
         "artist": "Zámbó Jimmy",
         "year": 1991,
-        "youtubeId": "u4JIQhNAYqM"
+        "youtubeId": "H6JMI-X3cyw"
     },
     {
         "id": "1990_19",
@@ -356,7 +356,7 @@ export const MUSIC_LIBRARY: ICard[] = [
         "title": "Megdöglöm érted",
         "artist": "FLM",
         "year": 1997,
-        "youtubeId": "aSrl1THXomI"
+        "youtubeId": "r5RU2d0CFPc"
     },
     {
         "id": "1990_46",
@@ -370,7 +370,7 @@ export const MUSIC_LIBRARY: ICard[] = [
         "title": "Szabó János",
         "artist": "Pa-dö-dö",
         "year": 1992,
-        "youtubeId": "dOnxcXifvVM"
+        "youtubeId": "0cmMgFg1Ht0"
     },
     {
         "id": "1990_57",
@@ -573,7 +573,7 @@ export const MUSIC_LIBRARY: ICard[] = [
         "title": "Bad Habits",
         "artist": "Ed Sheeran",
         "year": 2021,
-        "youtubeId": "orJSJGHjBLI"
+        "youtubeId": "ho1RzYneMtM"
     },
     {
         "id": "2020_12",
@@ -825,7 +825,7 @@ export const MUSIC_LIBRARY: ICard[] = [
         "title": "Reszket a hold a tó vizén",
         "artist": "Németh Lehel",
         "year": 1959,
-        "youtubeId": "UyqynyZxh2I"
+        "youtubeId": "PpsUOOfb-vE"
     },
     {
         "id": "1960_1",
